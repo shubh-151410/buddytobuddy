@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">BuddyToBody</string>
+  <string name="facebook_app_id">344314396243106</string>
+  <string name="fb_login_protocol_scheme">fb344314396243106</string>
+</resources>
