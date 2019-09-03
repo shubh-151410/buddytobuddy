@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:BuddyToBody/profilescreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -77,20 +78,6 @@ class _SettingScreenState extends State<SettingScreen> {
       throw Exception("Error opening asset file");
     }
   }
-
-//  Future<File> getFileFromUrl(String url) async {
-//    try {
-//      var data = await http.get(url);
-//      var bytes = data.bodyBytes;
-//      var dir = await getApplicationDocumentsDirectory();
-//      File file = File("${dir.path}/mypdfonline.pdf");
-//
-//      File urlFile = await file.writeAsBytes(bytes);
-//      return urlFile;
-//    } catch (e) {
-//      throw Exception("Error opening url file");
-//    }
-//  }
 
   Future pdfviewer() async {
     PDFDocument doc = await PDFDocument.fromURL(
@@ -303,7 +290,12 @@ class _SettingScreenState extends State<SettingScreen> {
                               child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: GestureDetector(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => Profile()));
+                                    },
                                     child: Text(
                                       "Edit Profile",
                                       style: TextStyle(
@@ -358,37 +350,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             ),
                           ],
                         ),
-                        Column(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(left: 15.0),
-                              child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: GestureDetector(
-                                    onTap: () {},
-                                    child: Text(
-                                      "Change Password",
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.white),
-                                    ),
-                                  )),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: 15.0, top: 3.0, right: 15.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Color(0xff6f92c4),
-                                      width: 4.0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+
                         Column(
                           children: <Widget>[
                             Row(
@@ -410,7 +372,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                       )),
                                 ),
                                 Align(
-                                  // alignment: Alignment.topCenter,
+                                   alignment: Alignment.bottomRight,
                                   child: Switch(
                                       value: isSwitched,
                                       onChanged: (value) {

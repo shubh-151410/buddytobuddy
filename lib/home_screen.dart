@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import './image_picker_dialog.dart';
 import './image_picker_handler.dart';
@@ -28,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen>
   Position currentLocation;
   Geolocator geolocator = Geolocator();
 
-  String name, email, password, confirmpassword, dogname, about;
+  String name, email, password, confirmpassword, dogname, about, photourl;
   int Zip;
 
   StreamSubscription<DocumentSnapshot> subscription;
@@ -71,10 +75,8 @@ class _HomeScreenState extends State<HomeScreen>
     } on Exception {
       currentLocation = null;
     }
-    print('center $_center');
+
   }
-
-
 
   @override
   void dispose() {
@@ -95,10 +97,13 @@ class _HomeScreenState extends State<HomeScreen>
         "DogName": dogname,
         "lattitude": lattitude.toString(),
         "longitude": langitude.toString(),
+        "photourl": "",
+        'chattingWith': null
       };
 
       Firestore.instance
           .collection('userdetails')
+
           .add(data)
           .then((result) => {
                 Navigator.push(
@@ -391,7 +396,7 @@ class _HomeScreenState extends State<HomeScreen>
   String validateEmail(String value) {
     String pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regExp = new RegExp(pattern);
+    RegExp regExp = RegExp(pattern);
     if (value.length == 0) {
       return "Email is Required";
     } else if (!regExp.hasMatch(value)) {

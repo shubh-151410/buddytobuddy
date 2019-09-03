@@ -21,11 +21,15 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   TextEditingController controllerNickname;
   TextEditingController controllerAboutMe;
+  TextEditingController controllerDogName;
+  TextEditingController controllerZip;
   SharedPreferences prefs;
   String id = '';
   String nickname = '';
   String aboutMe = '';
   String photoUrl = '';
+  String DogName = '';
+  String Zip = '';
 
   bool isLoading = false;
   File avatarImageFile;
@@ -43,13 +47,15 @@ class _ProfileState extends State<Profile> {
     prefs = await SharedPreferences.getInstance();
     id = prefs.getString('id') ?? '';
     nickname = prefs.getString('name') ?? '';
-    print(nickname);
+
     aboutMe = prefs.getString('aboutMe') ?? '';
     photoUrl = prefs.getString('photoUrl') ?? '';
 
     setState(() {
       controllerNickname = new TextEditingController(text: nickname);
       controllerAboutMe = new TextEditingController(text: aboutMe);
+      controllerDogName = TextEditingController(text: DogName);
+      controllerZip = TextEditingController(text: Zip);
     });
   }
 
@@ -75,10 +81,11 @@ class _ProfileState extends State<Profile> {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
+
           Firestore.instance.collection('userdetails').document(id).updateData({
             'name': nickname,
-            'aboutMe': aboutMe,
-            'photourl': photoUrl
+            'About': aboutMe,
+            'photourl': photoUrl,
           }).then((data) async {
             await prefs.setString('photoUrl', photoUrl);
             setState(() {
@@ -116,8 +123,10 @@ class _ProfileState extends State<Profile> {
 
     Firestore.instance.collection('userdetails').document(id).updateData({
       'name': nickname,
-      'aboutMe': aboutMe,
-      'photourl': photoUrl
+      'About': aboutMe,
+      'photoUrl': photoUrl,
+      'DogName': DogName,
+      'Zip': Zip
     }).then((data) async {
       await prefs.setString('name', nickname);
       await prefs.setString('aboutMe', aboutMe);
@@ -364,6 +373,8 @@ class _ProfileState extends State<Profile> {
                         margin: EdgeInsets.only(left: 30.0, right: 30.0),
                       ),
 
+                      //Email
+
                       // About me
                       Container(
                         child: Text(
@@ -395,6 +406,66 @@ class _ProfileState extends State<Profile> {
                         ),
                         margin: EdgeInsets.only(left: 30.0, right: 30.0),
                       ),
+                      Container(
+                        child: Text(
+                          'Dog Name',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor),
+                        ),
+                        margin:
+                            EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
+                      ),
+                      Container(
+                        child: Theme(
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Dog Name',
+                              contentPadding: EdgeInsets.all(5.0),
+                              hintStyle: TextStyle(color: greyColor),
+                            ),
+                            controller: controllerDogName,
+                            onChanged: (value) {
+                              aboutMe = value;
+                            },
+                            focusNode: focusNodeAboutMe,
+                          ),
+                        ),
+                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                      ),
+                      Container(
+                        child: Text(
+                          'Zip',
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor),
+                        ),
+                        margin:
+                            EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
+                      ),
+                      Container(
+                        child: Theme(
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Zip',
+                              contentPadding: EdgeInsets.all(5.0),
+                              hintStyle: TextStyle(color: greyColor),
+                            ),
+                            controller: controllerZip,
+                            onChanged: (value) {
+                              aboutMe = value;
+                            },
+                            focusNode: focusNodeAboutMe,
+                          ),
+                        ),
+                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                      ),
                     ],
                     crossAxisAlignment: CrossAxisAlignment.start,
                   ),
@@ -415,42 +486,6 @@ class _ProfileState extends State<Profile> {
                               style: TextStyle(color: Colors.white)),
                         ),
                       )),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  Material(
-                      elevation: 5.0,
-                      borderRadius: BorderRadius.circular(30.0),
-                      color: Color(0xff274986),
-                      child: Container(
-                        width: 150.0,
-                        height: 60.0,
-                        child: MaterialButton(
-                          padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SettingScreen()),
-                            );
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Icon(
-                                Icons.settings,
-                                color: Colors.white,
-                              ),
-                              SizedBox(width: 5),
-                              Text(
-                                "Settings",
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ))
                 ],
               ),
             )

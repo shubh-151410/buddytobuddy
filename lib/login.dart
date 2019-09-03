@@ -1,4 +1,5 @@
 import 'package:BuddyToBody/mapScreen.dart';
+import 'package:BuddyToBody/password.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -10,7 +11,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 
 import './home_screen.dart';
 
@@ -58,6 +58,14 @@ class _NewLogInState extends State<NewLogIn> {
     getUserLocation();
     isSignedIn();
   }
+  @override
+  // ignore: must_call_super
+  void dispose(){
+    this.setState(() {
+      isLoading = false;
+    });
+  }
+
 
   Future<Position> locateUser() {
     return Geolocator()
@@ -85,7 +93,7 @@ class _NewLogInState extends State<NewLogIn> {
     });
     prefs = await SharedPreferences.getInstance();
     isLoggedIn = await _googlSignIn.isSignedIn();
-    print(isLoggedIn);
+
     if (isLoggedIn) {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => Information()));
@@ -97,8 +105,6 @@ class _NewLogInState extends State<NewLogIn> {
 
   //
   void onLoginStatusChanged(bool isLoggedIn, {profileData}) {
-    print("Error On Facebook");
-
     setState(() {
       print("Status Error");
       this.isLoggedIn = isLoggedIn;
@@ -147,7 +153,10 @@ class _NewLogInState extends State<NewLogIn> {
           'createdAt': DateTime.now().microsecondsSinceEpoch.toString(),
           "lattitude": lattitude.toString(),
           "longitude": langitude.toString(),
-          'chattingWith': null
+          'chattingWith': null,
+          'About': null,
+          'DogName': null,
+          'Zip': null
         });
         currentUser = userDetails;
         await prefs.setString('id', currentUser.uid);
@@ -192,6 +201,9 @@ class _NewLogInState extends State<NewLogIn> {
   GoogleSignIn googleAuth = GoogleSignIn();
 
   Future _authenticationFireBase() async {
+    this.setState(() {
+      isLoading = true;
+    });
     if (_key.currentState.validate()) {
       _key.currentState.save();
       QuerySnapshot querySnapshot = await Firestore.instance
@@ -205,6 +217,9 @@ class _NewLogInState extends State<NewLogIn> {
             context,
             MaterialPageRoute(builder: (context) => Information()),
           );
+          this.setState(() {
+            isLoading = false;
+          });
         }
       }
     } else {
@@ -306,24 +321,15 @@ class _NewLogInState extends State<NewLogIn> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.only(top: 20, bottom: 1.0),
+                            padding: EdgeInsets.only(top: 10, bottom: 1.0),
                             child: Image.asset(
-                              "assets/images/Logo.png",
-                              height: 120,
-                              width: 120,
+                              "assets/images/ColorLogoMedium.png",
+                              height: 250,
+                              width: 250,
                             ),
                           ),
-                          SizedBox(
-                            height: 0,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 0.0),
-                            child: Image.asset(
-                              "assets/images/buddy.png",
-                              height: 120,
-                              width: 120,
-                            ),
-                          ),
+
+
                           SizedBox(
                             height: 20,
                           ),
@@ -344,7 +350,25 @@ class _NewLogInState extends State<NewLogIn> {
 //                                bottom: BorderSide(
 //                                    width: 2.0, color: Colors.blueAccent))),
                           ),
-                          SizedBox(height: 20),
+                          SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.bottomLeft,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PasswordUi()));
+                              },
+                              child: Text(
+                                "Forgot Password",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueAccent),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -380,7 +404,6 @@ class _NewLogInState extends State<NewLogIn> {
                               SizedBox(
                                 width: 10,
                               ),
-
                               Container(
                                 height: 50,
                                 width: 50,
@@ -456,11 +479,11 @@ class _NewLogInState extends State<NewLogIn> {
         onLoginStatusChanged(false);
         break;
       case FacebookLoginStatus.loggedIn:
-         var graphResponse = await http.get(
-             'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email,picture.height(200)&access_token=${facebookLoginResult.accessToken.token}');
+        var graphResponse = await http.get(
+            'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email,picture.height(200)&access_token=${facebookLoginResult.accessToken.token}');
 
-         var profile = json.decode(graphResponse.body);
-         print(profile.toString());
+        var profile = json.decode(graphResponse.body);
+        print(profile.toString());
         Navigator.push(
           context,
           new MaterialPageRoute(

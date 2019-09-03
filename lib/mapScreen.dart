@@ -2,6 +2,7 @@ import 'package:BuddyToBody/SettingUi.dart';
 import 'package:BuddyToBody/profilescreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -126,7 +127,7 @@ class _InformationState extends State<Information> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Profile()),
+                                  builder: (context) => SettingScreen()),
                             );
                           },
                           child: Icon(
@@ -191,11 +192,96 @@ class _InformationState extends State<Information> {
                       double.parse(snapshot.data.documents[i]["lattitude"]),
                       double.parse(snapshot.data.documents[i]["longitude"])),
                   icon: BitmapDescriptor.defaultMarker,
-                  infoWindow:
-                      InfoWindow(title: snapshot.data.documents[i]["name"])),
+                  onTap: () {
+                    profileDialogInfo();
+                  },
+                  infoWindow: InfoWindow(
+                      title: snapshot.data.documents[i]["name"],
+                      onTap: () {
+
+                        print(snapshot.data.documents[i].documentID);
+                        customDialog();
+                      })),
           ]));
     } else {
       return Container();
     }
+  }
+
+  Future<void> profileDialogInfo() async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return customDialog();
+        });
+  }
+}
+
+class customDialog extends StatefulWidget {
+  @override
+  _customDialogState createState() => _customDialogState();
+}
+
+class _customDialogState extends State<customDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+      elevation: 0.0,
+      backgroundColor: Colors.white,
+      child: dialog(context),
+    );
+  }
+
+  Widget dialog(BuildContext context) {
+    return Container(
+      height: 400,
+      alignment: Alignment.topCenter,
+      decoration: BoxDecoration(color: Color(0xff2183e7)),
+      child: Column(
+        children: <Widget>[
+          Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.cancel,
+                    color: Colors.white,
+                  ),
+                ),
+              )),
+          Center(
+            child: new CircleAvatar(
+              radius: 50.0,
+              backgroundColor: const Color(0xFF778899),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 113,
+              padding: EdgeInsets.only(left: 30.0,right: 30.0),
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+
+                  Text("About",style: TextStyle(fontSize: 15,color: Colors.white),),
+
+                ],
+              ),
+              decoration: BoxDecoration(
+                  color: Color(0xff052e73),
+                  borderRadius: BorderRadius.circular(20.0)),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

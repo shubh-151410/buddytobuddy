@@ -22,7 +22,6 @@ dependencies:
 
   google_maps_flutter: ^0.5.19
   geocoder: ^0.1.1
-  
   geolocator: ^5.0.1
   location: ^2.3.5
   firebase_database: ^3.0.4
@@ -31,6 +30,7 @@ dependencies:
   flutter_plugin_pdf_viewer: ^1.0.7
   flutter_pdfview: ^1.0.0+9
   path_provider: ^1.2.0
+  flutter_launcher_icons: ^0.7.2+1
 
   pdftron_flutter:
     git:
@@ -65,6 +65,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.7.2+1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/AppIconMedium.png"
 
 
 # For information on the generic Dart part of this file, see the
@@ -109,6 +115,7 @@ flutter:
   #   - family: facebook
   #     fonts:
   #       - assets: assets/fonts/facebook.ttf
+
   assets:
     - assets/images/Facebook.png
     - assets/images/Googleplus.png
@@ -123,4 +130,6 @@ flutter:
     - assets/images/photo_camera.png
     - assets/icons/Notification.svg
     - assets/policy.pdf
+    - assets/images/AppIconMedium.png
+    - assets/images/ColorLogoMedium.png
     
