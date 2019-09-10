@@ -31,6 +31,7 @@ dependencies:
   flutter_pdfview: ^1.0.0+9
   path_provider: ^1.2.0
   flutter_launcher_icons: ^0.7.2+1
+  splashscreen: ^1.2.0
 
   pdftron_flutter:
     git:
@@ -59,6 +60,7 @@ dependencies:
   shared_preferences: ^0.5.3+4
   fluttertoast: ^3.1.0
   firebase_storage: ^3.0.5
+  flutter_twitter_login: ^1.1.0
 
   
 
@@ -132,4 +134,6 @@ flutter:
     - assets/policy.pdf
     - assets/images/AppIconMedium.png
     - assets/images/ColorLogoMedium.png
+    - assets/ColorLogoMedium.png
+    - assets/images/logo.png
     

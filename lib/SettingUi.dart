@@ -50,12 +50,7 @@ class _SettingScreenState extends State<SettingScreen> {
   void initState() {
     super.initState();
 
-//    getFileFromUrl("https://drive.google.com/open?id=13sRZzF4GsvHuHBgkRTYFiA3eFNr9Cbof").then((f) {
-//      setState(() {
-//        urlPDFPath = f.path;
-//        print(urlPDFPath);
-//      });
-//    });
+
 
     getFileFromAsset("assets/policy.pdf").then((f) {
       setState(() {
@@ -79,10 +74,7 @@ class _SettingScreenState extends State<SettingScreen> {
     }
   }
 
-  Future pdfviewer() async {
-    PDFDocument doc = await PDFDocument.fromURL(
-        'https://drive.google.com/open?id=13sRZzF4GsvHuHBgkRTYFiA3eFNr9Cbof');
-  }
+ 
 
   @override
   Widget build(BuildContext context) {

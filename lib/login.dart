@@ -1,18 +1,20 @@
+import 'dart:convert';
+
 import 'package:BuddyToBody/mapScreen.dart';
 import 'package:BuddyToBody/password.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_twitter_login/flutter_twitter_login.dart';
 
-import './home_screen.dart';
+import './register_screen.dart';
 
 class LogIn extends StatelessWidget {
   @override
@@ -50,6 +52,13 @@ class _NewLogInState extends State<NewLogIn> {
   double lattitude;
   double langitude;
   LatLng _center;
+  bool isPasswordRight = false;
+
+  static final TwitterLogin twitterLogin = new TwitterLogin(
+    consumerKey: 'n4V8JJp393HIyjYgq8gddXHEZ',
+    consumerSecret: 'abSPqsiKDMR9A3ZUJdkqJ1oWVlTwvvuniTDsrEnIDkMaA2HgJL',
+  );
+  String _message = 'Logged out.';
 
   @override
   void initState() {
@@ -57,20 +66,31 @@ class _NewLogInState extends State<NewLogIn> {
     super.initState();
     getUserLocation();
     isSignedIn();
+    //isFirebaseSignedIn();
   }
+
   @override
   // ignore: must_call_super
-  void dispose(){
+  void dispose() {
+    useremailcontroller.clear();
+    passwordcontroller.clear();
     this.setState(() {
       isLoading = false;
     });
   }
 
-
   Future<Position> locateUser() {
     return Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   }
+
+  // void isFirebaseSignedIn() async{
+  //   this.setState(() {
+  //     isLoading = true;
+  //   });
+  //   prefs = await SharedPreferences.getInstance();
+
+  // }
 
   getUserLocation() async {
     try {
@@ -84,7 +104,7 @@ class _NewLogInState extends State<NewLogIn> {
     } on Exception {
       currentLocation = null;
     }
-    print('center $_center');
+    //print('center $_center');
   }
 
   void isSignedIn() async {
@@ -109,6 +129,38 @@ class _NewLogInState extends State<NewLogIn> {
       print("Status Error");
       this.isLoggedIn = isLoggedIn;
       this.profileData = profileData;
+    });
+  }
+
+  void _login() async {
+    final TwitterLoginResult result = await twitterLogin.authorize();
+    String newMessage;
+
+    switch (result.status) {
+      case TwitterLoginStatus.loggedIn:
+        newMessage = 'Logged in! username: ${result.session.username}';
+
+        Navigator.push(
+          context,
+          new MaterialPageRoute(
+            builder: (context) => new Information(),
+          ),
+        );
+
+        break;
+      case TwitterLoginStatus.cancelledByUser:
+        newMessage = 'Login cancelled by user.';
+
+        break;
+      case TwitterLoginStatus.error:
+        newMessage = 'Login error: ${result.errorMessage}';
+
+        break;
+    }
+
+    setState(() {
+      _message = newMessage;
+      print(_message);
     });
   }
 
@@ -149,7 +201,7 @@ class _NewLogInState extends State<NewLogIn> {
           'name': userDetails.displayName,
           'email': userDetails.email,
           'id': userDetails.uid,
-          'photourl': userDetails.photoUrl,
+          'photoUrl': userDetails.photoUrl,
           'createdAt': DateTime.now().microsecondsSinceEpoch.toString(),
           "lattitude": lattitude.toString(),
           "longitude": langitude.toString(),
@@ -203,6 +255,7 @@ class _NewLogInState extends State<NewLogIn> {
   Future _authenticationFireBase() async {
     this.setState(() {
       isLoading = true;
+      isPasswordRight = false;
     });
     if (_key.currentState.validate()) {
       _key.currentState.save();
@@ -213,18 +266,23 @@ class _NewLogInState extends State<NewLogIn> {
       var list = querySnapshot.documents;
       for (int i = 0; i < querySnapshot.documents.length; i++) {
         if (email == list[i]["email"] && password == list[i]["password"]) {
+          await prefs.setString(
+              "loginId", querySnapshot.documents[i].documentID);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Information()),
           );
+        } else {
           this.setState(() {
             isLoading = false;
+            isPasswordRight = true;
           });
         }
       }
     } else {
       setState(() {
         _validate = true;
+        isLoading = false;
       });
     }
   }
@@ -238,10 +296,18 @@ class _NewLogInState extends State<NewLogIn> {
       minLines: 1,
       maxLines: 1,
       obscureText: false,
+      style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
       autofocus: true,
       textAlign: TextAlign.center,
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.all(10.0),
+        focusColor: Colors.blueAccent,
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blueAccent),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blueAccent),
+        ),
+        contentPadding: EdgeInsets.all(3.0),
         hintText: "EMAIL ID",
         hintStyle: TextStyle(color: Colors.blueAccent),
       ),
@@ -258,9 +324,16 @@ class _NewLogInState extends State<NewLogIn> {
       maxLines: 1,
       obscureText: true,
       autofocus: true,
+      style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
       textAlign: TextAlign.center,
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.all(10.0),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blueAccent),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blueAccent),
+        ),
+        contentPadding: EdgeInsets.all(3.0),
         hintText: "PASSWORD",
         hintStyle: TextStyle(color: Colors.blueAccent),
       ),
@@ -310,65 +383,73 @@ class _NewLogInState extends State<NewLogIn> {
           children: <Widget>[
             Center(
                 child: SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                    padding: const EdgeInsets.fromLTRB(36.0, 10, 36.0, 30),
-                    child: Form(
+              child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(36.0, 93.0, 36.0, 30),
+                    child: Center(
+                        child: Form(
                       key: _key,
                       autovalidate: _validate,
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(top: 10, bottom: 1.0),
-                            child: Image.asset(
-                              "assets/images/ColorLogoMedium.png",
-                              height: 250,
-                              width: 250,
+                          Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 0.0, bottom: 0.0),
+                              child: Image.asset(
+                                "assets/images/ColorLogoMedium.png",
+                                height: 150,
+                                width: 150,
+                              ),
                             ),
                           ),
-
-
                           SizedBox(
                             height: 20,
                           ),
                           Container(
                             child: username_email,
-//                        decoration: BoxDecoration(
-//                            border: Border(
-//                                bottom: BorderSide(
-//                                    width: 2.0, color: Colors.blueAccent))),
                           ),
                           SizedBox(
                             height: 20,
                           ),
                           Container(
                             child: PasswordField,
-//                        decoration: BoxDecoration(
-//                            border: Border(
-//                                bottom: BorderSide(
-//                                    width: 2.0, color: Colors.blueAccent))),
                           ),
-                          SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.bottomLeft,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => PasswordUi()));
-                              },
-                              child: Text(
-                                "Forgot Password",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blueAccent),
+                          SizedBox(height: 15),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Align(
+                                alignment: Alignment.bottomLeft,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PasswordUi()));
+                                  },
+                                  child: Text(
+                                    "Forgot Password ?",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blueAccent),
+                                  ),
+                                ),
                               ),
-                            ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Visibility(
+                                  visible: isPasswordRight,
+                                  child: Text("Wrong Password Please Try Again!",style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold,fontSize: 12.0),),
+                                ),
+                              )
+                            ],
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 15),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -398,7 +479,7 @@ class _NewLogInState extends State<NewLogIn> {
                                 child: GestureDetector(
                                   child:
                                       Image.asset("assets/images/Twitter.png"),
-                                  onTap: () {},
+                                  onTap: _login,
                                 ),
                               ),
                               SizedBox(
@@ -432,7 +513,7 @@ class _NewLogInState extends State<NewLogIn> {
                         ],
                       ),
                     )),
-              ),
+                  )),
             )),
             Positioned(
               child: isLoading

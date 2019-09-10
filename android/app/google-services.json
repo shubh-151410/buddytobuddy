@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "1025155610080-aqpe4lc6d86s2qnnpv9gqlfrbgjuq0au.apps.googleusercontent.com",
+          "client_id": "1025155610080-0keromtf83vptjl7tqbatift1outuu3i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.buddytobuddy",
-            "certificate_hash": "9ae0fdd372c7a1a1932987c1fa0ef8c7449d929c"
+            "certificate_hash": "0a512acfef6dcb02bf45faa479af8cb961a7415f"
           }
         },
         {

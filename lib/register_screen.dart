@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import './image_picker_dialog.dart';
-import './image_picker_handler.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
 
+import 'package:BuddyToBody/SettingUi.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+
+import './image_picker_handler.dart';
 import 'mapScreen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,6 +33,9 @@ class _HomeScreenState extends State<HomeScreen>
   LatLng _center;
   Position currentLocation;
   Geolocator geolocator = Geolocator();
+  String urlPDFPath = "";
+  String assetPDFPath = "";
+  bool isLoading = false;
 
   String name, email, password, confirmpassword, dogname, about, photourl;
   int Zip;
@@ -48,7 +53,14 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+
     getUserLocation();
+    getFileFromAsset("assets/policy.pdf").then((f) {
+      setState(() {
+        assetPDFPath = f.path;
+        print(assetPDFPath);
+      });
+    });
     _controller = new AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -56,6 +68,20 @@ class _HomeScreenState extends State<HomeScreen>
 
     imagePicker = new ImagePickerHandler(this, _controller);
     imagePicker.init();
+  }
+
+  Future<File> getFileFromAsset(String asset) async {
+    try {
+      var data = await rootBundle.load(asset);
+      var bytes = data.buffer.asUint8List();
+      var dir = await getApplicationDocumentsDirectory();
+      File file = File("${dir.path}/policy.pdf");
+
+      File assetFile = await file.writeAsBytes(bytes);
+      return assetFile;
+    } catch (e) {
+      throw Exception("Error opening asset file");
+    }
   }
 
   Future<Position> locateUser() {
@@ -75,7 +101,6 @@ class _HomeScreenState extends State<HomeScreen>
     } on Exception {
       currentLocation = null;
     }
-
   }
 
   @override
@@ -84,9 +109,20 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  Future _add() {
+  Future _add() async {
+    this.setState(() {
+      isLoading = true;
+    });
     if (_key.currentState.validate()) {
       _key.currentState.save();
+      FirebaseAuth mAuth = FirebaseAuth.instance;
+
+      StorageReference firebaseStorageRef =
+          FirebaseStorage.instance.ref().child("UserPhoto");
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
+      StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+      final String Url = await taskSnapshot.ref.getDownloadURL();
+      print(Url);
       Map<String, String> data = <String, String>{
         "name": name,
         "email": email,
@@ -97,23 +133,23 @@ class _HomeScreenState extends State<HomeScreen>
         "DogName": dogname,
         "lattitude": lattitude.toString(),
         "longitude": langitude.toString(),
-        "photourl": "",
+        "photoUrl": Url,
         'chattingWith': null
       };
 
-      Firestore.instance
-          .collection('userdetails')
+      await Firestore.instance.collection('userdetails').add(data);
 
-          .add(data)
-          .then((result) => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Information()),
-                ),
-              })
-          .catchError((error) => print(error));
+      Navigator.push(
+        context,
+        new MaterialPageRoute(
+          builder: (context) => new Information(),
+        ),
+      );
+      this.setState(() {
+        isLoading = false;
+      });
     } else {
-      setState(() {
+      this.setState(() {
         _validate = true;
       });
     }
@@ -128,68 +164,87 @@ class _HomeScreenState extends State<HomeScreen>
           backgroundColor: Color(0xff182C61),
           elevation: 0.0,
         ),
-        body: Container(
-          height: divheight,
-          color: Color(0xff182C61),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () => imagePicker.showDialog(context),
-                    child: new Container(
-                      child: _image == null
-                          ? new Stack(
-                              children: <Widget>[
-                                new Center(
-                                  child: new CircleAvatar(
-                                    radius: 50.0,
-                                    backgroundColor: const Color(0xFF778899),
-                                  ),
-                                ),
-                                new Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(top: 25.0),
-                                    child: new Image.asset(
-                                      "assets/images/photo_camera.png",
-                                      height: 50.0,
+        body: Stack(
+          fit: StackFit.loose,
+          children: <Widget>[
+            Container(
+              height: divheight,
+              width: MediaQuery.of(context).size.width,
+              color: Color(0xff182C61),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
+                  child: Column(
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () => imagePicker.showDialog(context),
+                        child: new Container(
+                          child: _image == null
+                              ? new Stack(
+                                  children: <Widget>[
+                                    new Center(
+                                      child: new CircleAvatar(
+                                        radius: 50.0,
+                                        backgroundColor:
+                                            const Color(0xFF778899),
+                                      ),
                                     ),
-                                  ),
+                                    new Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: 25.0),
+                                        child: new Image.asset(
+                                          "assets/images/photo_camera.png",
+                                          height: 50.0,
+                                        ),
+                                      ),
+                                    )
+                                  ],
                                 )
-                              ],
-                            )
-                          : new Container(
-                              height: 160.0,
-                              width: 160.0,
-                              decoration: new BoxDecoration(
-                                color: const Color(0xff7c94b6),
-                                image: new DecorationImage(
-                                  image: new ExactAssetImage(_image.path),
-                                  fit: BoxFit.cover,
+                              : new Container(
+                                  height: 160.0,
+                                  width: 160.0,
+                                  decoration: new BoxDecoration(
+                                    color: const Color(0xff7c94b6),
+                                    image: new DecorationImage(
+                                      image: new ExactAssetImage(_image.path),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    border: Border.all(
+                                        color: Colors.white, width: 2.0),
+                                    borderRadius: new BorderRadius.all(
+                                        const Radius.circular(80.0)),
+                                  ),
                                 ),
-                                border:
-                                    Border.all(color: Colors.white, width: 2.0),
-                                borderRadius: new BorderRadius.all(
-                                    const Radius.circular(80.0)),
-                              ),
-                            ),
-                    ),
+                        ),
+                      ),
+                      Form(
+                        key: _key,
+                        autovalidate: _validate,
+                        child: FormUI(context),
+                      ),
+                    ],
                   ),
-                  Form(
-                    key: _key,
-                    autovalidate: _validate,
-                    child: FormUI(),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
+            Positioned(
+              child: isLoading
+                  ? Container(
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
+                        ),
+                      ),
+                      color: Colors.white.withOpacity(0.8),
+                    )
+                  : Container(),
+            ),
+          ],
         ));
   }
 
-  Widget FormUI() {
+  Widget FormUI(BuildContext context) {
     return Column(
       children: <Widget>[
         TextFormField(
@@ -203,7 +258,13 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10.0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            contentPadding: EdgeInsets.all(3.0),
             labelText: "Name",
             labelStyle: TextStyle(color: Colors.white),
           ),
@@ -211,6 +272,9 @@ class _HomeScreenState extends State<HomeScreen>
           onSaved: (String val) {
             name = val;
           },
+        ),
+        SizedBox(
+          height: 10,
         ),
         //
         TextFormField(
@@ -224,7 +288,13 @@ class _HomeScreenState extends State<HomeScreen>
           textAlign: TextAlign.start,
           style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10.0),
+            contentPadding: EdgeInsets.all(3.0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
             labelText: "E-mail",
             labelStyle: TextStyle(color: Colors.white),
             //errorText: useremailvalidate ? 'Email Can\'t Be Empty' : null,
@@ -233,6 +303,9 @@ class _HomeScreenState extends State<HomeScreen>
           onSaved: (String val) {
             email = val;
           },
+        ),
+        SizedBox(
+          height: 10,
         ),
 
         TextFormField(
@@ -246,7 +319,13 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10.0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            contentPadding: EdgeInsets.all(3.0),
             labelText: "Password",
             labelStyle: TextStyle(color: Colors.white),
             //errorText: passwordvallidate ? 'Password Can\'t Be Empty' : null,
@@ -255,6 +334,9 @@ class _HomeScreenState extends State<HomeScreen>
           onSaved: (String value) {
             password = value;
           },
+        ),
+        SizedBox(
+          height: 10,
         ),
 
         TextFormField(
@@ -268,7 +350,13 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10.0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            contentPadding: EdgeInsets.all(3.0),
             labelText: "ConfirmPassword",
             labelStyle: TextStyle(color: Colors.white),
             //errorText: confirmpasswordvalidate ? 'Password Can\'t Be Empty' : null,
@@ -277,6 +365,9 @@ class _HomeScreenState extends State<HomeScreen>
           onSaved: (String val) {
             confirmpassword = val;
           },
+        ),
+        SizedBox(
+          height: 10,
         ),
         TextFormField(
           //controller: useremailcontroller,
@@ -289,7 +380,13 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10.0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            contentPadding: EdgeInsets.all(3.0),
             labelText: "Dog Name",
             labelStyle: TextStyle(color: Colors.white),
             //errorText: dog_namevalidate ? 'Dog name Can\'t Be Empty' : null,
@@ -298,6 +395,9 @@ class _HomeScreenState extends State<HomeScreen>
           onSaved: (String val) {
             dogname = val;
           },
+        ),
+        SizedBox(
+          height: 10,
         ),
         TextFormField(
           //controller: useremailcontroller,
@@ -310,7 +410,13 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10.0),
+            contentPadding: EdgeInsets.all(3.0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
             labelText: "About",
             labelStyle: TextStyle(color: Colors.white),
             //errorText: aboutcontrollervalidate ? 'About Can\'t Be Empty' : null,
@@ -319,6 +425,9 @@ class _HomeScreenState extends State<HomeScreen>
           onSaved: (String value) {
             about = value;
           },
+        ),
+        SizedBox(
+          height: 10,
         ),
 
         TextFormField(
@@ -335,7 +444,13 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(10.0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            contentPadding: EdgeInsets.all(3.0),
             labelText: "Zip",
             labelStyle: TextStyle(color: Colors.white),
             //errorText: zipcontrollervalidate ? 'Zip Can\'t Be Empty' : null,
@@ -344,6 +459,9 @@ class _HomeScreenState extends State<HomeScreen>
           onSaved: (String value) {
             Zip = int.parse(value);
           },
+        ),
+        SizedBox(
+          height: 10,
         ),
         Material(
             elevation: 5.0,
@@ -370,7 +488,12 @@ class _HomeScreenState extends State<HomeScreen>
               value: false,
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PdfViewPage(path: assetPDFPath)));
+              },
               child: Text(
                 "By Signing in,you are agreeing to our Terms of services",
                 style: TextStyle(fontSize: 11, color: Colors.white),

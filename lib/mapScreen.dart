@@ -1,5 +1,6 @@
 import 'package:BuddyToBody/SettingUi.dart';
 import 'package:BuddyToBody/profilescreen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -179,46 +180,58 @@ class _InformationState extends State<Information> {
           mapType: MapType.normal,
           initialCameraPosition:
               CameraPosition(target: LatLng(lattitude, langitude), zoom: 10),
+          zoomGesturesEnabled: true,
+          compassEnabled: true,
+          mapToolbarEnabled: true,
           onMapCreated: (GoogleMapController controller) {
             _controller.complete(controller);
+            mapController.setMapStyle(
+                '[{"featureType": "all","stylers": [{ "color": "#C0C0C0" }]},{"featureType": "road.arterial","elementType": "geometry","stylers": [{ "color": "#CCFFFF" }]},{"featureType": "landscape","elementType": "labels","stylers": [{ "visibility": "off" }]}]');
           },
           markers: Set<Marker>.of(<Marker>[
             for (int i = 0; i < snapshot.data.documents.length; i++)
               Marker(
-                  visible: true,
-                  draggable: true,
-                  markerId: MarkerId("$i"),
-                  position: LatLng(
-                      double.parse(snapshot.data.documents[i]["lattitude"]),
-                      double.parse(snapshot.data.documents[i]["longitude"])),
-                  icon: BitmapDescriptor.defaultMarker,
-                  onTap: () {
-                    profileDialogInfo();
-                  },
-                  infoWindow: InfoWindow(
-                      title: snapshot.data.documents[i]["name"],
-                      onTap: () {
-
-                        print(snapshot.data.documents[i].documentID);
-                        customDialog();
-                      })),
+                visible: true,
+                draggable: true,
+                markerId: MarkerId("$i"),
+                position: LatLng(
+                    double.parse(snapshot.data.documents[i]["lattitude"]),
+                    double.parse(snapshot.data.documents[i]["longitude"])),
+                icon: BitmapDescriptor.defaultMarker,
+                onTap: () {
+                  print(snapshot.data.documents[i]["About"]);
+                  profileDialogInfo(
+                      snapshot.data.documents[i]["name"],
+                      snapshot.data.documents[i]["photoUrl"],
+                      snapshot.data.documents[i]["About"]);
+                },
+              ),
           ]));
     } else {
       return Container();
     }
   }
 
-  Future<void> profileDialogInfo() async {
+  Future<void> profileDialogInfo(
+      String name, String photoUrl, String about) async {
     return showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return customDialog();
+          return customDialog(name, photoUrl, about);
         });
   }
 }
 
 class customDialog extends StatefulWidget {
+  static String userName;
+  static String userphotoUrl;
+  static String About;
+  customDialog(String name, String photoUrl, String about) {
+    userName = name;
+    userphotoUrl = photoUrl;
+    About = about;
+  }
   @override
   _customDialogState createState() => _customDialogState();
 }
@@ -235,6 +248,8 @@ class _customDialogState extends State<customDialog> {
   }
 
   Widget dialog(BuildContext context) {
+    print(customDialog.About);
+    print(customDialog.userName);
     return Container(
       height: 400,
       alignment: Alignment.topCenter,
@@ -256,23 +271,84 @@ class _customDialogState extends State<customDialog> {
                 ),
               )),
           Center(
-            child: new CircleAvatar(
-              radius: 50.0,
-              backgroundColor: const Color(0xFF778899),
-            ),
-          ),
+              child: Stack(
+            children: <Widget>[
+              (customDialog.userphotoUrl != '')
+                  ? Material(
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) => Container(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.orange),
+                          ),
+                          width: 90.0,
+                          height: 90.0,
+                          padding: EdgeInsets.all(20.0),
+                        ),
+                        imageUrl: customDialog.userphotoUrl,
+                        width: 90.0,
+                        height: 90.0,
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                      clipBehavior: Clip.hardEdge,
+                    )
+                  : Icon(
+                      Icons.account_circle,
+                      size: 90.0,
+                      color: Colors.grey,
+                    )
+            ],
+          )),
+          Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                child: Text(
+                  customDialog.userName,
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              )),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
               height: 113,
-              padding: EdgeInsets.only(left: 30.0,right: 30.0),
+              margin: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+              padding: EdgeInsets.only(left: 50.0, right: 50.0),
               width: MediaQuery.of(context).size.width,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-
-                  Text("About",style: TextStyle(fontSize: 15,color: Colors.white),),
-
+                  Stack(
+                    children: <Widget>[
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          Padding(
+                              padding: EdgeInsets.only(top: 5.0),
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Text(
+                                  "ABOUT",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18),
+                                ),
+                              )),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          (customDialog.About != '')
+                              ? Text(
+                                  customDialog.About,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 15),
+                                )
+                              : Text("about")
+                        ],
+                      )
+                    ],
+                  )
                 ],
               ),
               decoration: BoxDecoration(
@@ -285,3 +361,5 @@ class _customDialogState extends State<customDialog> {
     );
   }
 }
+
+//
