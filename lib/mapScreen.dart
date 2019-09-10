@@ -1,16 +1,13 @@
+import 'dart:async';
+
 import 'package:BuddyToBody/SettingUi.dart';
-import 'package:BuddyToBody/profilescreen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-import 'package:flutter/cupertino.dart';
-
 import 'package:geolocator/geolocator.dart';
-import 'dart:async';
-import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Information extends StatefulWidget {
   @override
@@ -61,87 +58,89 @@ class _InformationState extends State<Information> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        bottomNavigationBar: Container(
-            child: Container(
-          height: 63.0,
-          decoration: new BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: new BorderRadius.only(
-                  topLeft: const Radius.circular(40.0),
-                  topRight: const Radius.circular(40.0))),
-          child: new Opacity(
-              opacity: 0.8,
-              child: Container(
-                decoration: new BoxDecoration(
-                    color: Color(0xff002064),
-                    borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(50.0),
-                        topRight: const Radius.circular(50.0))),
-                child: new Center(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    // SizedBox(width: 22.0),
-                    Container(
-                      height: 35,
-                      width: 35,
-                      child: Image.asset(
-                        "assets/images/Home.png",
-                        color: Colors.white,
-                      ),
-                    ),
-                    // SizedBox(width: 40.0),
-                    Container(
-                      height: 35,
-                      width: 35,
-                      child: Image.asset(
-                        "assets/images/shopping-cart.png",
-                        color: Colors.white,
-                      ),
-                    ),
-                    //SizedBox(width: 40.0),
-                    Container(
-                      height: 35,
-                      width: 35,
-                      child: Image.asset(
-                        "assets/images/Chat.png",
-                        color: Colors.white.withOpacity(1.0),
-                      ),
-                    ),
-                    // SizedBox(
-                    //   width: 40,
-                    // ),
-                    Container(
-                      height: 35,
-                      width: 35,
-                      child: Image.asset(
-                        "assets/images/Schedule.png",
-                        color: Colors.white,
-                      ),
-                    ),
-                    //SizedBox(width: 50),
-                    Container(
-                        height: 35,
-                        width: 35,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SettingScreen()),
-                            );
-                          },
-                          child: Icon(
-                            Icons.settings,
-                            color: Colors.white,
-                            size: 40.0,
-                          ),
-                        ))
-                  ],
-                )),
-              )),
-        )),
-        body: StreamBuilder<QuerySnapshot>(
+//        bottomNavigationBar: Container(
+//            child: Container(
+//          height: 63.0,
+//          decoration: new BoxDecoration(
+//              color: Colors.transparent,
+//              borderRadius: new BorderRadius.only(
+//                  topLeft: const Radius.circular(40.0),
+//                  topRight: const Radius.circular(40.0))),
+//          child: new Opacity(
+//              opacity: 0.8,
+//              child: Container(
+//                decoration: new BoxDecoration(
+//                    color: Color(0xff002064),
+//                    borderRadius: new BorderRadius.only(
+//                        topLeft: const Radius.circular(50.0),
+//                        topRight: const Radius.circular(50.0))),
+//                child: new Center(
+//                    child: Row(
+//                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                  children: <Widget>[
+//                    // SizedBox(width: 22.0),
+//                    Container(
+//                      height: 35,
+//                      width: 35,
+//                      child: Image.asset(
+//                        "assets/images/Home.png",
+//                        color: Colors.white,
+//                      ),
+//                    ),
+//                    // SizedBox(width: 40.0),
+//                    Container(
+//                      height: 35,
+//                      width: 35,
+//                      child: Image.asset(
+//                        "assets/images/shopping-cart.png",
+//                        color: Colors.white,
+//                      ),
+//                    ),
+//                    //SizedBox(width: 40.0),
+//                    Container(
+//                      height: 35,
+//                      width: 35,
+//                      child: Image.asset(
+//                        "assets/images/Chat.png",
+//                        color: Colors.white.withOpacity(1.0),
+//                      ),
+//                    ),
+//                    // SizedBox(
+//                    //   width: 40,
+//                    // ),
+//                    Container(
+//                      height: 35,
+//                      width: 35,
+//                      child: Image.asset(
+//                        "assets/images/Schedule.png",
+//                        color: Colors.white,
+//                      ),
+//                    ),
+//                    //SizedBox(width: 50),
+//                    Container(
+//                        height: 35,
+//                        width: 35,
+//                        child: GestureDetector(
+//                          onTap: () {
+//                            Navigator.push(
+//                              context,
+//                              MaterialPageRoute(
+//                                  builder: (context) => SettingScreen()),
+//                            );
+//                          },
+//                          child: Icon(
+//                            Icons.settings,
+//                            color: Colors.white,
+//                            size: 40.0,
+//                          ),
+//                        ))
+//                  ],
+//                )),
+//              )),
+//        )),
+        body: Stack(
+      children: <Widget>[
+        StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance.collection('userdetails').snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -169,7 +168,113 @@ class _InformationState extends State<Information> {
               );
             }
           },
-        ));
+        ),
+        Positioned(
+          right: 20.0,
+          top: 30.0,
+          child: Opacity(
+              opacity: 0.8,
+              child: GestureDetector(
+                child: ClipOval(
+                  child: Container(
+                    color: Color(0xff002064),
+                    height: 40,
+                    width: 40,
+                    child: Icon(
+                      Icons.notifications_active,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )),
+        ),
+        Positioned(
+            bottom: 0.0,
+            child: Container(
+                width: MediaQuery.of(context).size.width,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 63.0,
+                  decoration: new BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: new BorderRadius.only(
+                          topLeft: const Radius.circular(40.0),
+                          topRight: const Radius.circular(40.0))),
+                  child: new Opacity(
+                      opacity: 0.8,
+                      child: Container(
+                        decoration: new BoxDecoration(
+                            color: Color(0xff002064),
+                            borderRadius: new BorderRadius.only(
+                                topLeft: const Radius.circular(50.0),
+                                topRight: const Radius.circular(50.0))),
+                        child: new Center(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            // SizedBox(width: 22.0),
+                            Container(
+                              height: 35,
+                              width: 35,
+                              child: Image.asset(
+                                "assets/images/Home.png",
+                                color: Colors.white,
+                              ),
+                            ),
+                            // SizedBox(width: 40.0),
+                            Container(
+                              height: 35,
+                              width: 35,
+                              child: Image.asset(
+                                "assets/images/shopping-cart.png",
+                                color: Colors.white,
+                              ),
+                            ),
+                            //SizedBox(width: 40.0),
+                            Container(
+                              height: 35,
+                              width: 35,
+                              child: Image.asset(
+                                "assets/images/Chat.png",
+                                color: Colors.white.withOpacity(1.0),
+                              ),
+                            ),
+                            // SizedBox(
+                            //   width: 40,
+                            // ),
+                            Container(
+                              height: 35,
+                              width: 35,
+                              child: Image.asset(
+                                "assets/images/Schedule.png",
+                                color: Colors.white,
+                              ),
+                            ),
+                            //SizedBox(width: 50),
+                            Container(
+                                height: 35,
+                                width: 35,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              SettingScreen()),
+                                    );
+                                  },
+                                  child: Icon(
+                                    Icons.settings,
+                                    color: Colors.white,
+                                    size: 40.0,
+                                  ),
+                                ))
+                          ],
+                        )),
+                      )),
+                )))
+      ],
+    ));
   }
 
   Widget googlemap(
@@ -227,11 +332,13 @@ class customDialog extends StatefulWidget {
   static String userName;
   static String userphotoUrl;
   static String About;
+
   customDialog(String name, String photoUrl, String about) {
     userName = name;
     userphotoUrl = photoUrl;
     About = about;
   }
+
   @override
   _customDialogState createState() => _customDialogState();
 }
