@@ -4,9 +4,9 @@ import 'package:BuddyToBody/SettingUi.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,10 +19,10 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  TextEditingController controllerNickname;
-  TextEditingController controllerAboutMe;
-  TextEditingController controllerDogName;
-  TextEditingController controllerZip;
+  TextEditingController controllerNickname = TextEditingController();
+  TextEditingController controllerAboutMe = TextEditingController();
+  TextEditingController controllerDogName = TextEditingController();
+  TextEditingController controllerZip = TextEditingController();
   SharedPreferences prefs;
   String id = '';
   String nickname = '';
@@ -82,7 +82,7 @@ class _ProfileState extends State<Profile> {
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
 
-          Firestore.instance.collection('userdetails').document(id).updateData({
+          Firestore.instance.collection('users').document(id).updateData({
             'name': nickname,
             'About': aboutMe,
             'photourl': photoUrl,
@@ -121,7 +121,7 @@ class _ProfileState extends State<Profile> {
       isLoading = true;
     });
 
-    Firestore.instance.collection('userdetails').document(id).updateData({
+    Firestore.instance.collection('users').document(id).updateData({
       'name': nickname,
       'About': aboutMe,
       'photoUrl': photoUrl,

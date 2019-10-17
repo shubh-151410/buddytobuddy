@@ -12,11 +12,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import './image_picker_handler.dart';
 import 'mapScreen.dart';
-
+String twitterUserName;
 class HomeScreen extends StatefulWidget {
+
+  HomeScreen([String name]){
+    twitterUserName = name;
+  }
   @override
   _HomeScreenState createState() => new _HomeScreenState();
 }
@@ -25,9 +30,14 @@ class _HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin, ImagePickerListener {
   GlobalKey<FormState> _key = new GlobalKey();
   bool _validate = false;
+
+
+
   File _image;
   AnimationController _controller;
   ImagePickerHandler imagePicker;
+
+
   double lattitude;
   double langitude;
   LatLng _center;
@@ -36,24 +46,29 @@ class _HomeScreenState extends State<HomeScreen>
   String urlPDFPath = "";
   String assetPDFPath = "";
   bool isLoading = false;
+  
 
   String name, email, password, confirmpassword, dogname, about, photourl;
   int Zip;
 
   StreamSubscription<DocumentSnapshot> subscription;
 
-  final usernamecontroller = TextEditingController();
-  final useremailcontroller = TextEditingController();
-  final passwordcontroller = TextEditingController();
-  final confirmpasswordcontroller = TextEditingController();
-  final dog_namecontroller = TextEditingController();
-  final aboutcontroller = TextEditingController();
-  final zipcontroller = TextEditingController();
+  TextEditingController usernamecontroller = TextEditingController();
+  TextEditingController useremailcontroller = TextEditingController();
+  TextEditingController passwordcontroller = TextEditingController();
+  TextEditingController confirmpasswordcontroller = TextEditingController();
+  TextEditingController dog_namecontroller = TextEditingController();
+  TextEditingController aboutcontroller = TextEditingController();
+  TextEditingController zipcontroller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
+    if(twitterUserName!=null){
+      setState(() {
+        usernamecontroller = TextEditingController(text: twitterUserName);
+      });
+    }
     getUserLocation();
     getFileFromAsset("assets/policy.pdf").then((f) {
       setState(() {
@@ -61,12 +76,12 @@ class _HomeScreenState extends State<HomeScreen>
         print(assetPDFPath);
       });
     });
-    _controller = new AnimationController(
+    _controller =  AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
 
-    imagePicker = new ImagePickerHandler(this, _controller);
+    imagePicker =  ImagePickerHandler(this, _controller);
     imagePicker.init();
   }
 
@@ -115,14 +130,15 @@ class _HomeScreenState extends State<HomeScreen>
     });
     if (_key.currentState.validate()) {
       _key.currentState.save();
-      FirebaseAuth mAuth = FirebaseAuth.instance;
-
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final FirebaseAuth _auth = FirebaseAuth.instance;
+      final Firestore _firestore = Firestore.instance;
       StorageReference firebaseStorageRef =
           FirebaseStorage.instance.ref().child("UserPhoto");
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       final String Url = await taskSnapshot.ref.getDownloadURL();
-      print(Url);
+      FirebaseUser user = await _auth.currentUser();
       Map<String, String> data = <String, String>{
         "name": name,
         "email": email,
@@ -134,11 +150,17 @@ class _HomeScreenState extends State<HomeScreen>
         "lattitude": lattitude.toString(),
         "longitude": langitude.toString(),
         "photoUrl": Url,
-        'chattingWith': null
+        'chattingWith': null,
+        'id': null
       };
 
-      await Firestore.instance.collection('userdetails').add(data);
-
+      var userId = await Firestore.instance.collection('users').add(data);
+      await prefs.setString('id',userId.documentID);
+      await Firestore.instance
+          .collection('users')
+          .document(userId.documentID)
+          .updateData({'id': '${userId.documentID}'});
+      
       Navigator.push(
         context,
         new MaterialPageRoute(
@@ -165,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen>
           elevation: 0.0,
         ),
         body: Stack(
-          fit: StackFit.loose,
+          
           children: <Widget>[
             Container(
               height: divheight,
@@ -175,6 +197,7 @@ class _HomeScreenState extends State<HomeScreen>
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       GestureDetector(
                         onTap: () => imagePicker.showDialog(context),
@@ -184,14 +207,15 @@ class _HomeScreenState extends State<HomeScreen>
                                   children: <Widget>[
                                     new Center(
                                       child: new CircleAvatar(
-                                        radius: 50.0,
+                                        radius: 70.0,
                                         backgroundColor:
                                             const Color(0xFF778899),
                                       ),
                                     ),
                                     new Center(
+                                      
                                       child: Padding(
-                                        padding: EdgeInsets.only(top: 25.0),
+                                        padding: EdgeInsets.only(top: 30.0),
                                         child: new Image.asset(
                                           "assets/images/photo_camera.png",
                                           height: 50.0,
@@ -218,6 +242,7 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                       Form(
+
                         key: _key,
                         autovalidate: _validate,
                         child: FormUI(context),
@@ -246,6 +271,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget FormUI(BuildContext context) {
     return Column(
+     
       children: <Widget>[
         TextFormField(
           //controller: useremailcontroller,

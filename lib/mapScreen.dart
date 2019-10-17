@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import './schedule.dart';
 
 class Information extends StatefulWidget {
   @override
@@ -24,7 +25,7 @@ class _InformationState extends State<Information> {
 
   TextEditingController controllerAddress = TextEditingController();
   CollectionReference collectionReference =
-      Firestore.instance.collection('userdetails');
+      Firestore.instance.collection('users');
 
   double zoomCamera;
 
@@ -58,90 +59,10 @@ class _InformationState extends State<Information> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-//        bottomNavigationBar: Container(
-//            child: Container(
-//          height: 63.0,
-//          decoration: new BoxDecoration(
-//              color: Colors.transparent,
-//              borderRadius: new BorderRadius.only(
-//                  topLeft: const Radius.circular(40.0),
-//                  topRight: const Radius.circular(40.0))),
-//          child: new Opacity(
-//              opacity: 0.8,
-//              child: Container(
-//                decoration: new BoxDecoration(
-//                    color: Color(0xff002064),
-//                    borderRadius: new BorderRadius.only(
-//                        topLeft: const Radius.circular(50.0),
-//                        topRight: const Radius.circular(50.0))),
-//                child: new Center(
-//                    child: Row(
-//                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                  children: <Widget>[
-//                    // SizedBox(width: 22.0),
-//                    Container(
-//                      height: 35,
-//                      width: 35,
-//                      child: Image.asset(
-//                        "assets/images/Home.png",
-//                        color: Colors.white,
-//                      ),
-//                    ),
-//                    // SizedBox(width: 40.0),
-//                    Container(
-//                      height: 35,
-//                      width: 35,
-//                      child: Image.asset(
-//                        "assets/images/shopping-cart.png",
-//                        color: Colors.white,
-//                      ),
-//                    ),
-//                    //SizedBox(width: 40.0),
-//                    Container(
-//                      height: 35,
-//                      width: 35,
-//                      child: Image.asset(
-//                        "assets/images/Chat.png",
-//                        color: Colors.white.withOpacity(1.0),
-//                      ),
-//                    ),
-//                    // SizedBox(
-//                    //   width: 40,
-//                    // ),
-//                    Container(
-//                      height: 35,
-//                      width: 35,
-//                      child: Image.asset(
-//                        "assets/images/Schedule.png",
-//                        color: Colors.white,
-//                      ),
-//                    ),
-//                    //SizedBox(width: 50),
-//                    Container(
-//                        height: 35,
-//                        width: 35,
-//                        child: GestureDetector(
-//                          onTap: () {
-//                            Navigator.push(
-//                              context,
-//                              MaterialPageRoute(
-//                                  builder: (context) => SettingScreen()),
-//                            );
-//                          },
-//                          child: Icon(
-//                            Icons.settings,
-//                            color: Colors.white,
-//                            size: 40.0,
-//                          ),
-//                        ))
-//                  ],
-//                )),
-//              )),
-//        )),
         body: Stack(
       children: <Widget>[
         StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance.collection('userdetails').snapshots(),
+          stream: Firestore.instance.collection('users').snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasData) {
@@ -234,22 +155,39 @@ class _InformationState extends State<Information> {
                             Container(
                               height: 35,
                               width: 35,
-                              child: Image.asset(
-                                "assets/images/Chat.png",
-                                color: Colors.white.withOpacity(1.0),
+                              child: GestureDetector(
+                                onTap: (){
+                                  Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ScheduleBuddy()));
+                                },
+                                                              child: Image.asset(
+                                  "assets/images/Chat.png",
+                                  color: Colors.white.withOpacity(1.0),
+                                ),
                               ),
                             ),
                             // SizedBox(
                             //   width: 40,
                             // ),
                             Container(
-                              height: 35,
-                              width: 35,
-                              child: Image.asset(
-                                "assets/images/Schedule.png",
-                                color: Colors.white,
-                              ),
-                            ),
+                                height: 35,
+                                width: 35,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    // Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) =>
+                                    //             ScheduleBuddy()));
+                                  },
+                                  child: Image.asset(
+                                    "assets/images/Schedule.png",
+                                    color: Colors.white,
+                                  ),
+                                )),
                             //SizedBox(width: 50),
                             Container(
                                 height: 35,
@@ -290,27 +228,34 @@ class _InformationState extends State<Information> {
           mapToolbarEnabled: true,
           onMapCreated: (GoogleMapController controller) {
             _controller.complete(controller);
-            mapController.setMapStyle(
-                '[{"featureType": "all","stylers": [{ "color": "#C0C0C0" }]},{"featureType": "road.arterial","elementType": "geometry","stylers": [{ "color": "#CCFFFF" }]},{"featureType": "landscape","elementType": "labels","stylers": [{ "visibility": "off" }]}]');
           },
           markers: Set<Marker>.of(<Marker>[
-            for (int i = 0; i < snapshot.data.documents.length; i++)
-              Marker(
+            Marker(
                 visible: true,
                 draggable: true,
-                markerId: MarkerId("$i"),
-                position: LatLng(
-                    double.parse(snapshot.data.documents[i]["lattitude"]),
-                    double.parse(snapshot.data.documents[i]["longitude"])),
-                icon: BitmapDescriptor.defaultMarker,
-                onTap: () {
-                  print(snapshot.data.documents[i]["About"]);
-                  profileDialogInfo(
-                      snapshot.data.documents[i]["name"],
-                      snapshot.data.documents[i]["photoUrl"],
-                      snapshot.data.documents[i]["About"]);
-                },
-              ),
+                markerId: MarkerId("1"),
+                position: LatLng(lattitude, langitude),
+                icon: BitmapDescriptor.defaultMarker),
+            for (int i = 0; i < snapshot.data.documents.length; i++)
+              if (snapshot.data.documents[i]["lattitude"] != null &&
+                  snapshot.data.documents[i]["longitude"] != null)
+                Marker(
+                  visible: true,
+                  draggable: true,
+                  markerId: MarkerId("$i"),
+                  position: LatLng(
+                      double.parse(snapshot.data.documents[i]["lattitude"]),
+                      double.parse(snapshot.data.documents[i]["longitude"])),
+                  icon: BitmapDescriptor.fromAsset(
+                      "assets/images/index_Recovered.png"),
+                  onTap: () {
+                    print(snapshot.data.documents[i]["About"]);
+                    profileDialogInfo(
+                        snapshot.data.documents[i]["name"],
+                        snapshot.data.documents[i]["photoUrl"],
+                        snapshot.data.documents[i]["About"]);
+                  },
+                ),
           ]));
     } else {
       return Container();
@@ -346,6 +291,7 @@ class customDialog extends StatefulWidget {
 class _customDialogState extends State<customDialog> {
   @override
   Widget build(BuildContext context) {
+   
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
       elevation: 0.0,
@@ -355,8 +301,6 @@ class _customDialogState extends State<customDialog> {
   }
 
   Widget dialog(BuildContext context) {
-    print(customDialog.About);
-    print(customDialog.userName);
     return Container(
       height: 400,
       alignment: Alignment.topCenter,
@@ -408,15 +352,25 @@ class _customDialogState extends State<customDialog> {
                     )
             ],
           )),
-          Align(
-              alignment: Alignment.topCenter,
-              child: Container(
-                margin: EdgeInsets.only(top: 10, bottom: 10),
-                child: Text(
-                  customDialog.userName,
-                  style: TextStyle(color: Colors.white, fontSize: 15),
-                ),
-              )),
+          (customDialog.userName != null)
+              ? Align(
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                    child: Text(
+                      customDialog.userName,
+                      style: TextStyle(color: Colors.white, fontSize: 15),
+                    ),
+                  ))
+              : Align(
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                    child: Text(
+                      "EmptyName",
+                      style: TextStyle(color: Colors.white, fontSize: 15),
+                    ),
+                  )),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -445,22 +399,27 @@ class _customDialogState extends State<customDialog> {
                           SizedBox(
                             height: 10,
                           ),
-                          (customDialog.About != '')
+                          (customDialog.About != null)
                               ? Text(
                                   customDialog.About,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 15),
                                 )
-                              : Text("about")
+                              : Text(
+                                  "Please Enter About",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 15),
+                                )
                         ],
                       )
                     ],
-                  )
+                  ),
                 ],
               ),
               decoration: BoxDecoration(
-                  color: Color(0xff052e73),
-                  borderRadius: BorderRadius.circular(20.0)),
+                color: Color(0xff052e73),
+                borderRadius: BorderRadius.circular(20.0),
+              ),
             ),
           )
         ],

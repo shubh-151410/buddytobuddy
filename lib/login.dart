@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:BuddyToBody/mapScreen.dart';
 import 'package:BuddyToBody/password.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,7 +12,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_twitter_login/flutter_twitter_login.dart';
-
 import './register_screen.dart';
 
 class LogIn extends StatelessWidget {
@@ -84,14 +82,6 @@ class _NewLogInState extends State<NewLogIn> {
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   }
 
-  // void isFirebaseSignedIn() async{
-  //   this.setState(() {
-  //     isLoading = true;
-  //   });
-  //   prefs = await SharedPreferences.getInstance();
-
-  // }
-
   getUserLocation() async {
     try {
       currentLocation = await locateUser();
@@ -143,7 +133,7 @@ class _NewLogInState extends State<NewLogIn> {
         Navigator.push(
           context,
           new MaterialPageRoute(
-            builder: (context) => new Information(),
+            builder: (context) => HomeScreen(result.session.username),
           ),
         );
 
@@ -183,25 +173,25 @@ class _NewLogInState extends State<NewLogIn> {
         idToken: googleAuth.idToken,
       );
 
-      FirebaseUser userDetails =
-          await _firebaseAuth.signInWithCredential(credential);
+      FirebaseUser users = (await _firebaseAuth
+          .signInWithCredential(credential)) as FirebaseUser;
       ProviderDetails providerInfo =
-          new ProviderDetails(userDetails.providerId);
-      print(userDetails.displayName);
-      if (userDetails != null) {
+          new ProviderDetails(users.providerId);
+      print(users.displayName);
+      if (users != null) {
         final QuerySnapshot result = await Firestore.instance
-            .collection('userdetails')
-            .where('id', isEqualTo: userDetails.uid)
+            .collection('users')
+            .where('id', isEqualTo: users.uid)
             .getDocuments();
         final List<DocumentSnapshot> documents = result.documents;
         Firestore.instance
-            .collection('userdetails')
-            .document(userDetails.uid)
+            .collection('users')
+            .document(users.uid)
             .setData({
-          'name': userDetails.displayName,
-          'email': userDetails.email,
-          'id': userDetails.uid,
-          'photoUrl': userDetails.photoUrl,
+          'name': users.displayName,
+          'email': users.email,
+          'id': users.uid,
+          'photoUrl': users.photoUrl,
           'createdAt': DateTime.now().microsecondsSinceEpoch.toString(),
           "lattitude": lattitude.toString(),
           "longitude": langitude.toString(),
@@ -210,7 +200,7 @@ class _NewLogInState extends State<NewLogIn> {
           'DogName': null,
           'Zip': null
         });
-        currentUser = userDetails;
+        currentUser = users;
         await prefs.setString('id', currentUser.uid);
         await prefs.setString('name', currentUser.displayName);
         await prefs.setString('photoUrl', currentUser.photoUrl);
@@ -224,20 +214,14 @@ class _NewLogInState extends State<NewLogIn> {
       List<ProviderDetails> providerData = new List<ProviderDetails>();
       providerData.add(providerInfo);
 
-      UserDetails details = new UserDetails(
-        userDetails.providerId,
-        userDetails.displayName,
-        userDetails.photoUrl,
-        userDetails.email,
-        providerData,
-      );
+     
       Navigator.push(
         context,
         new MaterialPageRoute(
           builder: (context) => new Information(),
         ),
       );
-      return userDetails;
+      return users;
     } catch (e) {
       print(e);
       setState(() {
@@ -260,7 +244,7 @@ class _NewLogInState extends State<NewLogIn> {
     if (_key.currentState.validate()) {
       _key.currentState.save();
       QuerySnapshot querySnapshot = await Firestore.instance
-          .collection("userdetails")
+          .collection("users")
           .where("name")
           .getDocuments();
       var list = querySnapshot.documents;
@@ -422,31 +406,42 @@ class _NewLogInState extends State<NewLogIn> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PasswordUi()));
-                                  },
-                                  child: Text(
-                                    "Forgot Password ?",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blueAccent),
+                              Flexible(
+                                flex: 1,
+                                child: Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PasswordUi()));
+                                    },
+                                    child: Text(
+                                      "Forgot Password ?",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blueAccent),
+                                    ),
                                   ),
                                 ),
                               ),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: Visibility(
-                                  visible: isPasswordRight,
-                                  child: Text("Wrong Password Please Try Again!",style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold,fontSize: 12.0),),
-                                ),
-                              )
+                              Flexible(
+                                  flex: 1,
+                                  child: Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Visibility(
+                                      visible: false,
+                                      child: Text(
+                                        "Wrong Password Please Try Again!",
+                                        style: TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12.0),
+                                      ),
+                                    ),
+                                  ))
                             ],
                           ),
                           SizedBox(height: 15),
@@ -549,6 +544,8 @@ class _NewLogInState extends State<NewLogIn> {
   }
 
   Future<FirebaseUser> initiateFacebookLogin() async {
+    final FacebookLogin facebookSignIn = new FacebookLogin();
+    FirebaseUser user;
     var facebookLoginResult =
         await facebookLogin.logInWithReadPermissions(['email']);
 
@@ -560,11 +557,35 @@ class _NewLogInState extends State<NewLogIn> {
         onLoginStatusChanged(false);
         break;
       case FacebookLoginStatus.loggedIn:
+        FacebookAccessToken myToken = facebookLoginResult.accessToken;
+        AuthCredential credential =
+            FacebookAuthProvider.getCredential(accessToken: myToken.token);
+        user = (await _firebaseAuth.signInWithCredential(credential))
+            as FirebaseUser;
         var graphResponse = await http.get(
             'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email,picture.height(200)&access_token=${facebookLoginResult.accessToken.token}');
 
         var profile = json.decode(graphResponse.body);
-        print(profile.toString());
+        await Firestore.instance
+            .collection('users')
+            .document(profile["id"])
+            .setData({
+          'name': profile["name"],
+          'email': profile["email"],
+          'id': profile["id"],
+          'photoUrl': profile['picture']['data']['url'],
+          'createdAt': DateTime.now().microsecondsSinceEpoch.toString(),
+          "lattitude": lattitude.toString(),
+          "longitude": langitude.toString(),
+          'chattingWith': null,
+          'About': null,
+          'DogName': null,
+          'Zip': null
+        });
+        await prefs.setString('id', profile["id"]);
+        await prefs.setString('name', profile["name"]);
+        await prefs.setString('photoUrl', profile['picture']['data']['url']);
+
         Navigator.push(
           context,
           new MaterialPageRoute(
@@ -575,6 +596,7 @@ class _NewLogInState extends State<NewLogIn> {
         //onLoginStatusChanged(true, profileData: profile);
         break;
     }
+    return user;
   }
 
   _logout() async {
@@ -584,14 +606,14 @@ class _NewLogInState extends State<NewLogIn> {
   }
 }
 
-class UserDetails {
+class users {
   final String providerDetails;
   final String userName;
   final String photoUrl;
   final String userEmail;
   final List<ProviderDetails> providerData;
 
-  UserDetails(this.providerDetails, this.userName, this.photoUrl,
+  users(this.providerDetails, this.userName, this.photoUrl,
       this.userEmail, this.providerData);
 }
 

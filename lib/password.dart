@@ -61,7 +61,7 @@ class _PasswordUiState extends State<PasswordUi> {
     if (_key.currentState.validate()) {
       _key.currentState.save();
       QuerySnapshot querySnapshot = await Firestore.instance
-          .collection("userdetails")
+          .collection("users")
           .where("name")
           .getDocuments();
       var list = querySnapshot.documents;
@@ -69,7 +69,7 @@ class _PasswordUiState extends State<PasswordUi> {
       for (int i = 0; i < querySnapshot.documents.length; i++) {
         if (email == list[i]["email"]) {
           await Firestore.instance
-              .collection('userdetails')
+              .collection('users')
               .document(querySnapshot.documents[i].documentID)
               .updateData(
                   {'password': password, 'confirmPassword': confirmpassword});
