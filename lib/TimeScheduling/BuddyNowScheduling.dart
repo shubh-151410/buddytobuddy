@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../StepCounting.dart';
+import 'package:latlong/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Buddynow extends StatefulWidget {
   @override
@@ -9,6 +11,18 @@ class Buddynow extends StatefulWidget {
 }
 
 class _BuddynowState extends State<Buddynow> {
+  final Distance distance = new Distance();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final double km = distance.as(LengthUnit.Kilometer,
+        new LatLng(28.6110336, 77.0941551), new LatLng(28.6657873, 77.3786908));
+    print("@@@@@@@@@@@@@@@@@");
+    print(km);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -95,7 +109,7 @@ class _BuddynowState extends State<Buddynow> {
                   ),
                 ),
                 SizedBox(
-                  width: 100,
+                  width: 80,
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
@@ -106,25 +120,48 @@ class _BuddynowState extends State<Buddynow> {
                         MaterialPageRoute(builder: (context) => StepCounting()),
                       );
                     },
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Container(
-                        padding: EdgeInsets.all(5.0),
-                        child: Center(
-                          child: Text(
-                            "Dog Walk",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            padding: EdgeInsets.all(5.0),
+                            child: Center(
+                              child: Text(
+                                "Request",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            width: 90.0,
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                shape: BoxShape.rectangle,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
                           ),
                         ),
-                        width: 90.0,
-                        decoration: BoxDecoration(
-                            color: Colors.grey,
-                            shape: BoxShape.rectangle,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                      ),
+                        SizedBox(
+                          height: 5.0,
+                        ),
+                        Text(
+                          distance
+                                  .as(
+                                    LengthUnit.Kilometer,
+                                    LatLng(28.6110336, 77.0941551),
+                                    LatLng(
+                                        double.tryParse(snapshot.data
+                                            .documents[position]["lattitude"]),
+                                        double.tryParse(snapshot.data
+                                            .documents[position]["longitude"])),
+                                  )
+                                  .toString() +
+                              " Km Away",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
                     ),
                   ),
                 )
