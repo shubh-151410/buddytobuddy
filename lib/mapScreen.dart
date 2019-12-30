@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:BuddyToBody/SettingUi.dart';
+import 'package:BuddyToBody/chat.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +10,9 @@ import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import './schedule.dart';
+import 'buddyScheduling.dart';
+import './SettingUi.dart';
+import './HomeScreen.dart';
 
 class Information extends StatefulWidget {
   @override
@@ -19,6 +23,7 @@ class _InformationState extends State<Information> {
   double lattitude;
   double langitude;
   LatLng _center;
+  int _currentIndex = 0;
   Position currentLocation;
   Geolocator geolocator = Geolocator();
   Completer<GoogleMapController> _controller = Completer();
@@ -26,6 +31,13 @@ class _InformationState extends State<Information> {
   TextEditingController controllerAddress = TextEditingController();
   CollectionReference collectionReference =
       Firestore.instance.collection('users');
+
+  final List<Widget> _children = [
+    HomeScreen(),
+    ScheduleBuddy(),
+    BuddyScheduling(),
+    SettingScreen()
+  ];
 
   double zoomCamera;
 
@@ -56,163 +68,206 @@ class _InformationState extends State<Information> {
     }
   }
 
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-      children: <Widget>[
-        StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance.collection('users').snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasData) {
-              return googlemap(context, snapshot);
-            } else {
-              return Container(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      CircularProgressIndicator(
-                        backgroundColor: Colors.black,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        "Loading...",
-                        style: TextStyle(),
-                      )
-                    ],
-                  ),
-                ),
-              );
-            }
-          },
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: Color(0xff905c96),
+          // splashColor: Colors.yellowAccent,
+          // unselectedWidgetColor: Colors.green,
+          // primaryColor: Colors.red,
+          // textTheme: Theme.of(context)
+          //     .textTheme
+          //     .copyWith(caption: new TextStyle(color: Colors.grey)),
         ),
-        Positioned(
-          right: 20.0,
-          top: 30.0,
-          child: Opacity(
-              opacity: 0.8,
-              child: GestureDetector(
-                child: ClipOval(
-                  child: Container(
-                    color: Color(0xff002064),
-                    height: 40,
-                    width: 40,
-                    child: Icon(
-                      Icons.notifications_active,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              )),
+        child: BottomNavigationBar(
+          elevation: 5.0,
+          backgroundColor: Color(0xff905c96),
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.white,
+          unselectedLabelStyle: TextStyle(color: Colors.white),
+          selectedFontSize: 15.0,
+          onTap: onTabTapped, // new
+          currentIndex: _currentIndex,
+          items: [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home), title: Text("Home")),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.chat), title: Text("Chat")),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.schedule), title: Text("Schedule")),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.settings), title: Text("Setting")),
+          ],
         ),
-        Positioned(
-            bottom: 0.0,
-            child: Container(
-                width: MediaQuery.of(context).size.width,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 63.0,
-                  decoration: new BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: new BorderRadius.only(
-                          topLeft: const Radius.circular(40.0),
-                          topRight: const Radius.circular(40.0))),
-                  child: new Opacity(
-                      opacity: 0.8,
-                      child: Container(
-                        decoration: new BoxDecoration(
-                            color: Color(0xff002064),
-                            borderRadius: new BorderRadius.only(
-                                topLeft: const Radius.circular(50.0),
-                                topRight: const Radius.circular(50.0))),
-                        child: new Center(
-                            child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            // SizedBox(width: 22.0),
-                            Container(
-                              height: 35,
-                              width: 35,
-                              child: Image.asset(
-                                "assets/images/Home.png",
-                                color: Colors.white,
-                              ),
-                            ),
-                            // SizedBox(width: 40.0),
-                            Container(
-                              height: 35,
-                              width: 35,
-                              child: Image.asset(
-                                "assets/images/shopping-cart.png",
-                                color: Colors.white,
-                              ),
-                            ),
-                            //SizedBox(width: 40.0),
-                            Container(
-                              height: 35,
-                              width: 35,
-                              child: GestureDetector(
-                                onTap: (){
-                                  Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ScheduleBuddy()));
-                                },
-                                                              child: Image.asset(
-                                  "assets/images/Chat.png",
-                                  color: Colors.white.withOpacity(1.0),
-                                ),
-                              ),
-                            ),
-                            // SizedBox(
-                            //   width: 40,
-                            // ),
-                            Container(
-                                height: 35,
-                                width: 35,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             ScheduleBuddy()));
-                                  },
-                                  child: Image.asset(
-                                    "assets/images/Schedule.png",
-                                    color: Colors.white,
-                                  ),
-                                )),
-                            //SizedBox(width: 50),
-                            Container(
-                                height: 35,
-                                width: 35,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              SettingScreen()),
-                                    );
-                                  },
-                                  child: Icon(
-                                    Icons.settings,
-                                    color: Colors.white,
-                                    size: 40.0,
-                                  ),
-                                ))
-                          ],
-                        )),
-                      )),
-                )))
-      ],
-    ));
+      ),
+      body: _children[_currentIndex],
+      // body: Stack(
+      //   children: <Widget>[
+      //     StreamBuilder<QuerySnapshot>(
+      //       stream: Firestore.instance.collection('users').snapshots(),
+      //       builder:
+      //           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      //         if (snapshot.hasData) {
+      //           return googlemap(context, snapshot);
+      //         } else {
+      //           return Container(
+      //             child: Center(
+      //               child: Column(
+      //                 mainAxisAlignment: MainAxisAlignment.center,
+      //                 children: <Widget>[
+      //                   CircularProgressIndicator(
+      //                     backgroundColor: Colors.black,
+      //                   ),
+      //                   SizedBox(
+      //                     height: 20,
+      //                   ),
+      //                   Text(
+      //                     "Loading...",
+      //                     style: TextStyle(),
+      //                   )
+      //                 ],
+      //               ),
+      //             ),
+      //           );
+      //         }
+      //       },
+      //     ),
+          // Positioned(
+          //   right: 20.0,
+          //   top: 30.0,
+          //   child: Opacity(
+          //       opacity: 0.8,
+          //       child: GestureDetector(
+          //         child: ClipOval(
+          //           child: Container(
+          //             color: Color(0xff905c96),
+          //             height: 40,
+          //             width: 40,
+          //             child: Icon(
+          //               Icons.notifications_active,
+          //               color: Colors.white,
+          //             ),
+          //           ),
+          //         ),
+          //       )),
+          // ),
+      //    Positioned(
+      //       bottom: 0.0,
+      //       child: Container(
+      //         width: MediaQuery.of(context).size.width,
+      //         child: Container(
+      //           width: MediaQuery.of(context).size.width,
+      //           height: 63.0,
+      //           decoration: new BoxDecoration(
+      //               color: Colors.transparent,
+      //               borderRadius: new BorderRadius.only(
+      //                   topLeft: const Radius.circular(40.0),
+      //                   topRight: const Radius.circular(40.0))),
+      //           child: new Opacity(
+      //             opacity: 0.8,
+      //             child: Container(
+      //               decoration: new BoxDecoration(
+      //                   color: Color(0xff905c96),
+      //                   borderRadius: new BorderRadius.only(
+      //                       topLeft: const Radius.circular(50.0),
+      //                       topRight: const Radius.circular(50.0))),
+      //               child: new Center(
+      //                 child: Row(
+      //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //                   children: <Widget>[
+      //                     // SizedBox(width: 22.0),
+      //                     Container(
+      //                       height: 35,
+      //                       width: 35,
+      //                       child: Image.asset(
+      //                         "assets/images/Home.png",
+      //                         color: Colors.white,
+      //                       ),
+      //                     ),
+      //                     // SizedBox(width: 40.0),
+      //                     Container(
+      //                       height: 35,
+      //                       width: 35,
+      //                       child: Image.asset(
+      //                         "assets/images/shopping-cart.png",
+      //                         color: Colors.white,
+      //                       ),
+      //                     ),
+      //                     //SizedBox(width: 40.0),
+      //                     Container(
+      //                       height: 35,
+      //                       width: 35,
+      //                       child: InkWell(
+      //                         onTap: () {
+      //                           Navigator.push(
+      //                               context,
+      //                               MaterialPageRoute(
+      //                                   builder: (context) => ScheduleBuddy()));
+      //                         },
+      //                         child: Image.asset(
+      //                           "assets/images/Chat.png",
+      //                           color: Colors.white.withOpacity(1.0),
+      //                         ),
+      //                       ),
+      //                     ),
+      //                     // SizedBox(
+      //                     //   width: 40,
+      //                     // ),
+      //                     Container(
+      //                         height: 35,
+      //                         width: 35,
+      //                         child: InkWell(
+      //                           onTap: () {
+      //                             Navigator.push(
+      //                                 context,
+      //                                 MaterialPageRoute(
+      //                                     builder: (context) =>
+      //                                         BuddyScheduling()));
+      //                           },
+      //                           child: Image.asset(
+      //                             "assets/images/Schedule.png",
+      //                             color: Colors.white,
+      //                           ),
+      //                         )),
+      //                     //SizedBox(width: 50),
+      //                     Container(
+      //                       height: 35,
+      //                       width: 35,
+      //                       child: InkWell(
+      //                         onTap: () {
+      //                           Navigator.push(
+      //                             context,
+      //                             MaterialPageRoute(
+      //                               builder: (context) => SettingScreen(),
+      //                             ),
+      //                           );
+      //                         },
+      //                         child: Icon(
+      //                           Icons.settings,
+      //                           color: Colors.white,
+      //                           size: 40.0,
+      //                         ),
+      //                       ),
+      //                     )
+      //                   ],
+      //                 ),
+      //               ),
+      //             ),
+      //           ),
+      //         ),
+      //       ),
+      //     )
+      //   ],
+      // ),
+    );
   }
 
   Widget googlemap(
@@ -291,9 +346,8 @@ class customDialog extends StatefulWidget {
 class _customDialogState extends State<customDialog> {
   @override
   Widget build(BuildContext context) {
-   
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       elevation: 0.0,
       backgroundColor: Colors.white,
       child: dialog(context),
@@ -301,128 +355,131 @@ class _customDialogState extends State<customDialog> {
   }
 
   Widget dialog(BuildContext context) {
-    return Container(
-      height: 400,
-      alignment: Alignment.topCenter,
-      decoration: BoxDecoration(color: Color(0xff2183e7)),
-      child: Column(
-        children: <Widget>[
-          Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(
-                    Icons.cancel,
-                    color: Colors.white,
+    return Opacity(
+      opacity: 0.8,
+      child: Container(
+        height: 400,
+        alignment: Alignment.topCenter,
+        decoration: BoxDecoration(color: Color(0xff905c96)),
+        child: Column(
+          children: <Widget>[
+            Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.cancel,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-              )),
-          Center(
-              child: Stack(
-            children: <Widget>[
-              (customDialog.userphotoUrl != '')
-                  ? Material(
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) => Container(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.0,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.orange),
+                )),
+            Center(
+                child: Stack(
+              children: <Widget>[
+                (customDialog.userphotoUrl != '')
+                    ? Material(
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.orange),
+                            ),
+                            width: 90.0,
+                            height: 90.0,
+                            padding: EdgeInsets.all(20.0),
                           ),
+                          imageUrl: customDialog.userphotoUrl,
                           width: 90.0,
                           height: 90.0,
-                          padding: EdgeInsets.all(20.0),
+                          fit: BoxFit.cover,
                         ),
-                        imageUrl: customDialog.userphotoUrl,
-                        width: 90.0,
-                        height: 90.0,
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(45.0)),
-                      clipBehavior: Clip.hardEdge,
-                    )
-                  : Icon(
-                      Icons.account_circle,
-                      size: 90.0,
-                      color: Colors.grey,
-                    )
-            ],
-          )),
-          (customDialog.userName != null)
-              ? Align(
-                  alignment: Alignment.topCenter,
-                  child: Container(
-                    margin: EdgeInsets.only(top: 10, bottom: 10),
-                    child: Text(
-                      customDialog.userName,
-                      style: TextStyle(color: Colors.white, fontSize: 15),
-                    ),
-                  ))
-              : Align(
-                  alignment: Alignment.topCenter,
-                  child: Container(
-                    margin: EdgeInsets.only(top: 10, bottom: 10),
-                    child: Text(
-                      "EmptyName",
-                      style: TextStyle(color: Colors.white, fontSize: 15),
-                    ),
-                  )),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: 113,
-              margin: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-              padding: EdgeInsets.only(left: 50.0, right: 50.0),
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Stack(
-                    children: <Widget>[
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          Padding(
-                              padding: EdgeInsets.only(top: 5.0),
-                              child: Align(
-                                alignment: Alignment.topCenter,
-                                child: Text(
-                                  "ABOUT",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 18),
-                                ),
-                              )),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          (customDialog.About != null)
-                              ? Text(
-                                  customDialog.About,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 15),
-                                )
-                              : Text(
-                                  "Please Enter About",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 15),
-                                )
-                        ],
+                        borderRadius: BorderRadius.all(Radius.circular(45.0)),
+                        clipBehavior: Clip.hardEdge,
                       )
-                    ],
-                  ),
-                ],
+                    : Icon(
+                        Icons.account_circle,
+                        size: 90.0,
+                        color: Colors.grey,
+                      )
+              ],
+            )),
+            (customDialog.userName != null)
+                ? Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      margin: EdgeInsets.only(top: 10, bottom: 10),
+                      child: Text(
+                        customDialog.userName,
+                        style: TextStyle(color: Colors.white, fontSize: 15),
+                      ),
+                    ))
+                : Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      margin: EdgeInsets.only(top: 10, bottom: 10),
+                      child: Text(
+                        "EmptyName",
+                        style: TextStyle(color: Colors.white, fontSize: 15),
+                      ),
+                    )),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 113,
+                margin: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                padding: EdgeInsets.only(left: 50.0, right: 50.0),
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Stack(
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            Padding(
+                                padding: EdgeInsets.only(top: 5.0),
+                                child: Align(
+                                  alignment: Alignment.topCenter,
+                                  child: Text(
+                                    "ABOUT",
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 18),
+                                  ),
+                                )),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            (customDialog.About != null)
+                                ? Text(
+                                    customDialog.About,
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 15),
+                                  )
+                                : Text(
+                                    "Please Enter About",
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 15),
+                                  )
+                          ],
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+                decoration: BoxDecoration(
+                  color: Color(0xfff2e3ea),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
               ),
-              decoration: BoxDecoration(
-                color: Color(0xff052e73),
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

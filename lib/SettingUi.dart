@@ -76,7 +76,7 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget build(BuildContext context) {
     var divheight = MediaQuery.of(context).size.height;
     return Scaffold(
-        bottomNavigationBar: Container(
+       /* bottomNavigationBar: Container(
             child: Container(
           height: 63.0,
           decoration: new BoxDecoration(
@@ -85,7 +85,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   topRight: const Radius.circular(0.0))),
           child: Container(
             decoration: new BoxDecoration(
-                color: Color(0xff334d83),
+                color: Color(0xff905c96),
                 borderRadius: new BorderRadius.only(
                     topLeft: const Radius.circular(0.0),
                     topRight: const Radius.circular(0.0))),
@@ -152,7 +152,7 @@ class _SettingScreenState extends State<SettingScreen> {
               ],
             )),
           ),
-        )),
+        )),*/
         body: Stack(
           children: <Widget>[
             NestedScrollView(
@@ -163,9 +163,12 @@ class _SettingScreenState extends State<SettingScreen> {
                     expandedHeight: 80.0,
                     floating: false,
                     pinned: true,
-                    leading: Icon(Icons.arrow_back_ios),
+                    leading: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.arrow_back_ios),
+                    ),
                     centerTitle: true,
-                    backgroundColor: Color(0xff334d83),
+                    backgroundColor: Color(0xff905c96),
                     flexibleSpace: FlexibleSpaceBar(
                       centerTitle: true,
                       title: Text(
@@ -184,7 +187,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 // Optional
                 child: Container(
                     height: divheight,
-                    color: Color(0xff334d83),
+                    color: Color(0xff905c96),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -219,13 +222,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                     left: 15.0, top: 1.0, right: 15.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xff6f92c4),
-                                        width: 4.0,
-                                      ),
-                                    ),
-                                  ),
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.7,
+                                              color: Colors.white))),
                                 ),
                               ),
                             ],
@@ -259,13 +259,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                     left: 15.0, top: 3.0, right: 15.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xff6f92c4),
-                                        width: 4.0,
-                                      ),
-                                    ),
-                                  ),
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.7,
+                                              color: Colors.white))),
                                 ),
                               ),
                             ],
@@ -296,13 +293,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                     left: 15.0, top: 3.0, right: 15.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xff6f92c4),
-                                        width: 4.0,
-                                      ),
-                                    ),
-                                  ),
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.7,
+                                              color: Colors.white))),
                                 ),
                               ),
                             ],
@@ -327,13 +321,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                     left: 15.0, top: 3.0, right: 15.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xff6f92c4),
-                                        width: 4.0,
-                                      ),
-                                    ),
-                                  ),
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.7,
+                                              color: Colors.white))),
                                 ),
                               ),
                             ],
@@ -370,22 +361,19 @@ class _SettingScreenState extends State<SettingScreen> {
                                           });
                                         },
                                         activeTrackColor: Color(0xff98c1ef),
-                                        activeColor: Color(0xff147ae5)),
+                                        activeColor: Color(0xff905c96)),
                                   )
                                 ],
                               ),
                               Padding(
                                 padding: EdgeInsets.only(
-                                    left: 15.0, top: 3.0, right: 15.0),
+                                    left: 15.0, top: 0.0, right: 15.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xff6f92c4),
-                                        width: 4.0,
-                                      ),
-                                    ),
-                                  ),
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.7,
+                                              color: Colors.white))),
                                 ),
                               ),
                             ],
@@ -412,13 +400,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                     left: 15.0, top: 3.0, right: 15.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xff6f92c4),
-                                        width: 4.0,
-                                      ),
-                                    ),
-                                  ),
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.7,
+                                              color: Colors.white))),
                                 ),
                               ),
                             ],
@@ -455,13 +440,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                     left: 15.0, top: 3.0, right: 15.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xff6f92c4),
-                                        width: 4.0,
-                                      ),
-                                    ),
-                                  ),
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.7,
+                                              color: Colors.white))),
                                 ),
                               ),
                             ],
@@ -486,13 +468,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                     left: 15.0, top: 3.0, right: 15.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Color(0xff6f92c4),
-                                        width: 4.0,
-                                      ),
-                                    ),
-                                  ),
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.7,
+                                              color: Colors.white))),
                                 ),
                               ),
                             ],

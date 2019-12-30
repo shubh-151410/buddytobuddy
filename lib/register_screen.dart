@@ -16,10 +16,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import './image_picker_handler.dart';
 import 'mapScreen.dart';
-String twitterUserName;
-class HomeScreen extends StatefulWidget {
 
-  HomeScreen([String name]){
+String twitterUserName;
+
+class HomeScreen extends StatefulWidget {
+  HomeScreen([String name]) {
     twitterUserName = name;
   }
   @override
@@ -31,12 +32,9 @@ class _HomeScreenState extends State<HomeScreen>
   GlobalKey<FormState> _key = new GlobalKey();
   bool _validate = false;
 
-
-
   File _image;
   AnimationController _controller;
   ImagePickerHandler imagePicker;
-
 
   double lattitude;
   double langitude;
@@ -46,8 +44,7 @@ class _HomeScreenState extends State<HomeScreen>
   String urlPDFPath = "";
   String assetPDFPath = "";
   bool isLoading = false;
-  
-
+  bool isCheck = false;
   String name, email, password, confirmpassword, dogname, about, photourl;
   int Zip;
 
@@ -64,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    if(twitterUserName!=null){
+    if (twitterUserName != null) {
       setState(() {
         usernamecontroller = TextEditingController(text: twitterUserName);
       });
@@ -76,12 +73,12 @@ class _HomeScreenState extends State<HomeScreen>
         print(assetPDFPath);
       });
     });
-    _controller =  AnimationController(
+    _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
 
-    imagePicker =  ImagePickerHandler(this, _controller);
+    imagePicker = ImagePickerHandler(this, _controller);
     imagePicker.init();
   }
 
@@ -155,12 +152,12 @@ class _HomeScreenState extends State<HomeScreen>
       };
 
       var userId = await Firestore.instance.collection('users').add(data);
-      await prefs.setString('id',userId.documentID);
+      await prefs.setString('id', userId.documentID);
       await Firestore.instance
           .collection('users')
           .document(userId.documentID)
           .updateData({'id': '${userId.documentID}'});
-      
+
       Navigator.push(
         context,
         new MaterialPageRoute(
@@ -183,45 +180,45 @@ class _HomeScreenState extends State<HomeScreen>
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xff182C61),
+          title: Text("Register"),
+          centerTitle: true,
+          backgroundColor: Color(0xff905c96),
           elevation: 0.0,
         ),
         body: Stack(
-          
           children: <Widget>[
             Container(
               height: divheight,
               width: MediaQuery.of(context).size.width,
-              color: Color(0xff182C61),
+              color: Color(0xff905c96),
               child: SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      GestureDetector(
+                      InkWell(
                         onTap: () => imagePicker.showDialog(context),
-                        child: new Container(
+                        child: new Center(
                           child: _image == null
                               ? new Stack(
                                   children: <Widget>[
                                     new Center(
                                       child: new CircleAvatar(
-                                        radius: 70.0,
+                                        radius: 60.0,
                                         backgroundColor:
                                             const Color(0xFF778899),
                                       ),
                                     ),
                                     new Center(
-                                      
-                                      child: Padding(
-                                        padding: EdgeInsets.only(top: 30.0),
+                                      child: Container(
+                                        margin: EdgeInsets.only(top: 30),
                                         child: new Image.asset(
                                           "assets/images/photo_camera.png",
-                                          height: 50.0,
+                                          height: 60,
                                         ),
                                       ),
-                                    )
+                                    ),
                                   ],
                                 )
                               : new Container(
@@ -233,16 +230,17 @@ class _HomeScreenState extends State<HomeScreen>
                                       image: new ExactAssetImage(_image.path),
                                       fit: BoxFit.cover,
                                     ),
-                                    border: Border.all(
-                                        color: Colors.white, width: 2.0),
+                                    border: Border.all(width: 5.0),
                                     borderRadius: new BorderRadius.all(
-                                        const Radius.circular(80.0)),
+                                        const Radius.circular(100.0)),
                                   ),
                                 ),
                         ),
                       ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Form(
-
                         key: _key,
                         autovalidate: _validate,
                         child: FormUI(context),
@@ -271,7 +269,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget FormUI(BuildContext context) {
     return Column(
-     
       children: <Widget>[
         TextFormField(
           //controller: useremailcontroller,
@@ -284,15 +281,30 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            fillColor: Color(0xffaf5dcc),
+            filled: true,
+            prefixIcon: Icon(Icons.person,color: Colors.white,),
+            suffixIcon: Icon(
+              Icons.edit,
+              color: Colors.white,
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
             ),
-            contentPadding: EdgeInsets.all(3.0),
-            labelText: "Name",
-            labelStyle: TextStyle(color: Colors.white),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
+            ),
+            hintText: 'User Name',
+            contentPadding: new EdgeInsets.all(5.0),
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
           ),
           validator: validateName,
           onSaved: (String val) {
@@ -314,16 +326,30 @@ class _HomeScreenState extends State<HomeScreen>
           textAlign: TextAlign.start,
           style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(3.0),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            fillColor: Color(0xffaf5dcc),
+            filled: true,
+            prefixIcon: Icon(Icons.email,color: Colors.white,),
+            suffixIcon: Icon(
+              Icons.edit,
+              color: Colors.white,
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
             ),
-            labelText: "E-mail",
-            labelStyle: TextStyle(color: Colors.white),
-            //errorText: useremailvalidate ? 'Email Can\'t Be Empty' : null,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
+            ),
+            hintText: 'Email',
+            contentPadding: new EdgeInsets.all(5.0),
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
           ),
           validator: validateEmail,
           onSaved: (String val) {
@@ -345,16 +371,30 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            fillColor: Color(0xffaf5dcc),
+            filled: true,
+            prefixIcon: Icon(Icons.vpn_key,color: Colors.white,),
+            suffixIcon: Icon(
+              Icons.edit,
+              color: Colors.white,
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
             ),
-            contentPadding: EdgeInsets.all(3.0),
-            labelText: "Password",
-            labelStyle: TextStyle(color: Colors.white),
-            //errorText: passwordvallidate ? 'Password Can\'t Be Empty' : null,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
+            ),
+            hintText: 'Password',
+            contentPadding: new EdgeInsets.all(5.0),
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
           ),
           validator: validatePassword,
           onSaved: (String value) {
@@ -376,16 +416,30 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            fillColor: Color(0xffaf5dcc),
+            filled: true,
+            prefixIcon: Icon(Icons.vpn_key,color: Colors.white,),
+            suffixIcon: Icon(
+              Icons.edit,
+              color: Colors.white,
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
             ),
-            contentPadding: EdgeInsets.all(3.0),
-            labelText: "ConfirmPassword",
-            labelStyle: TextStyle(color: Colors.white),
-            //errorText: confirmpasswordvalidate ? 'Password Can\'t Be Empty' : null,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
+            ),
+            hintText: 'Confirm Password',
+            contentPadding: new EdgeInsets.all(5.0),
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
           ),
           validator: validateConfirmPassword,
           onSaved: (String val) {
@@ -406,16 +460,30 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            fillColor: Color(0xffaf5dcc),
+            filled: true,
+            prefixIcon: Icon(Icons.pets,color: Colors.white,),
+            suffixIcon: Icon(
+              Icons.edit,
+              color: Colors.white,
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
             ),
-            contentPadding: EdgeInsets.all(3.0),
-            labelText: "Dog Name",
-            labelStyle: TextStyle(color: Colors.white),
-            //errorText: dog_namevalidate ? 'Dog name Can\'t Be Empty' : null,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
+            ),
+            hintText: 'Dog Name',
+            contentPadding: new EdgeInsets.all(5.0),
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
           ),
           validator: validateDogName,
           onSaved: (String val) {
@@ -436,16 +504,30 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(3.0),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            fillColor: Color(0xffaf5dcc),
+            filled: true,
+            prefixIcon: Icon(Icons.assignment_ind,color: Colors.white,),
+            suffixIcon: Icon(
+              Icons.edit,
+              color: Colors.white,
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
             ),
-            labelText: "About",
-            labelStyle: TextStyle(color: Colors.white),
-            //errorText: aboutcontrollervalidate ? 'About Can\'t Be Empty' : null,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
+            ),
+            hintText: 'About',
+            contentPadding: new EdgeInsets.all(5.0),
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
           ),
           validator: validateAbout,
           onSaved: (String value) {
@@ -470,16 +552,30 @@ class _HomeScreenState extends State<HomeScreen>
           autofocus: false,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            fillColor: Color(0xffaf5dcc),
+            filled: true,
+            prefixIcon: Icon(Icons.fiber_pin,color: Colors.white,),
+            suffixIcon: Icon(
+              Icons.edit,
+              color: Colors.white,
             ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
             ),
-            contentPadding: EdgeInsets.all(3.0),
-            labelText: "Zip",
-            labelStyle: TextStyle(color: Colors.white),
-            //errorText: zipcontrollervalidate ? 'Zip Can\'t Be Empty' : null,
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(30.0),
+              ),
+            ),
+            hintText: 'Pin',
+            contentPadding: new EdgeInsets.all(5.0),
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
           ),
           validator: validateZip,
           onSaved: (String value) {
@@ -492,28 +588,32 @@ class _HomeScreenState extends State<HomeScreen>
         Material(
             elevation: 5.0,
             borderRadius: BorderRadius.circular(30.0),
-            color: Color(0xff274986),
+            color: Color(0xffaf5dcc),
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: 50.0,
               child: MaterialButton(
+                //disabledColor:(isCheck)?Colors.white: Color(0xffaf5dcc),
+
                 padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                 onPressed: _add,
-                child: Text("SIGN UP", style: TextStyle(color: Colors.white)),
+                child: Text("SIGN UP",
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
               ),
             )),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Checkbox(
+              checkColor: Colors.black,
               onChanged: (bool abcd) {
-                setState(() {
-                  abcd = true;
+                this.setState(() {
+                  this.isCheck = abcd;
                 });
               },
-              value: false,
+              value: isCheck,
             ),
-            GestureDetector(
+            InkWell(
               onTap: () {
                 Navigator.push(
                     context,

@@ -8,6 +8,10 @@ import 'dart:async';
 void main() {
   runApp(new MaterialApp(
     debugShowCheckedModeBanner: false,
+    theme: ThemeData(
+      bottomAppBarColor:  Color(0xff905c96),
+    
+    ),
     home: new SplashScreen(),
     routes: <String, WidgetBuilder>{
       '/HomeScreen': (BuildContext context) => new LogIn()

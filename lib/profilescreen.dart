@@ -150,108 +150,121 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     var divheight = MediaQuery.of(context).size.height;
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xff334d83),
-          elevation: 0.0,
-          actions: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.fromLTRB(5.0, 0, 5.0, 0),
-                  child: Icon(
-                    Icons.notifications_active,
-                  ),
-                )
-              ],
-            )
-          ],
-          leading: Icon(Icons.arrow_back_ios),
+      appBar: AppBar(
+        title: Text(
+          "Profile",
+          style: TextStyle(fontSize: 20, color: Colors.white),
         ),
-        bottomNavigationBar: Container(
-            child: Container(
-          height: 63.0,
+        centerTitle: true,
+        backgroundColor: Color(0xff905c96),
+        elevation: 0.0,
+        actions: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.fromLTRB(5.0, 0, 5.0, 0),
+                child: Icon(
+                  Icons.notifications_active,
+                ),
+              )
+            ],
+          )
+        ],
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back_ios),
+        )
+      ),
+      bottomNavigationBar: Container(
+          child: Container(
+        height: 63.0,
+        decoration: new BoxDecoration(
+            borderRadius: new BorderRadius.only(
+                topLeft: const Radius.circular(0.0),
+                topRight: const Radius.circular(0.0))),
+        child: Container(
           decoration: new BoxDecoration(
+              color: Color(0xff905c96),
               borderRadius: new BorderRadius.only(
                   topLeft: const Radius.circular(0.0),
                   topRight: const Radius.circular(0.0))),
-          child: Container(
-            decoration: new BoxDecoration(
-                color: Color(0xff334d83),
-                borderRadius: new BorderRadius.only(
-                    topLeft: const Radius.circular(0.0),
-                    topRight: const Radius.circular(0.0))),
-            child: new Center(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                // SizedBox(width: 22.0),
-                Container(
+          child: new Center(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              // SizedBox(width: 22.0),
+              Container(
+                height: 35,
+                width: 35,
+                child: Image.asset(
+                  "assets/images/Home.png",
+                  color: Colors.white,
+                ),
+              ),
+              // SizedBox(width: 40.0),
+              Container(
+                height: 35,
+                width: 35,
+                child: Image.asset(
+                  "assets/images/shopping-cart.png",
+                  color: Colors.white,
+                ),
+              ),
+              //SizedBox(width: 40.0),
+              Container(
+                height: 35,
+                width: 35,
+                child: Image.asset(
+                  "assets/images/Chat.png",
+                  color: Colors.white.withOpacity(1.0),
+                ),
+              ),
+              // SizedBox(
+              //   width: 40,
+              // ),
+              Container(
+                height: 35,
+                width: 35,
+                child: Image.asset(
+                  "assets/images/Schedule.png",
+                  color: Colors.white,
+                ),
+              ),
+              //SizedBox(width: 50),
+              Container(
                   height: 35,
                   width: 35,
-                  child: Image.asset(
-                    "assets/images/Home.png",
-                    color: Colors.white,
-                  ),
-                ),
-                // SizedBox(width: 40.0),
-                Container(
-                  height: 35,
-                  width: 35,
-                  child: Image.asset(
-                    "assets/images/shopping-cart.png",
-                    color: Colors.white,
-                  ),
-                ),
-                //SizedBox(width: 40.0),
-                Container(
-                  height: 35,
-                  width: 35,
-                  child: Image.asset(
-                    "assets/images/Chat.png",
-                    color: Colors.white.withOpacity(1.0),
-                  ),
-                ),
-                // SizedBox(
-                //   width: 40,
-                // ),
-                Container(
-                  height: 35,
-                  width: 35,
-                  child: Image.asset(
-                    "assets/images/Schedule.png",
-                    color: Colors.white,
-                  ),
-                ),
-                //SizedBox(width: 50),
-                Container(
-                    height: 35,
-                    width: 35,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SettingScreen()),
-                        );
-                      },
-                      child: Icon(
-                        Icons.settings,
-                        color: Colors.white,
-                        size: 40.0,
-                      ),
-                    ))
-              ],
-            )),
-          ),
-        )),
-        body: Stack(
-          children: <Widget>[
-            SingleChildScrollView(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SettingScreen()),
+                      );
+                    },
+                    child: Icon(
+                      Icons.settings,
+                      color: Colors.white,
+                      size: 40.0,
+                    ),
+                  ))
+            ],
+          )),
+        ),
+      )),
+      body: Stack(
+
+        children: <Widget>[
+          SingleChildScrollView(
+            child: Container(
+              color: Color(0xff905c96),
+              height: MediaQuery.of(context).size.height,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               
                 children: <Widget>[
                   Container(
+                    color: Color(0xff905c96),
                     child: Center(
                       child: Stack(
                         children: <Widget>[
@@ -269,7 +282,7 @@ class _ProfileState extends State<Profile> {
                                           ),
                                           width: 90.0,
                                           height: 90.0,
-                                          padding: EdgeInsets.all(20.0),
+                                          padding: EdgeInsets.all(10.0),
                                         ),
                                         imageUrl: photoUrl,
                                         width: 90.0,
@@ -311,7 +324,7 @@ class _ProfileState extends State<Profile> {
                       ),
                     ),
                     width: double.infinity,
-                    margin: EdgeInsets.all(20.0),
+                    margin: EdgeInsets.all(10.0),
                   ),
                   Center(
                       child: Row(
@@ -340,28 +353,40 @@ class _ProfileState extends State<Profile> {
                     ],
                   )),
                   Column(
+                  
                     children: <Widget>[
-                      // Username
+                    
                       Container(
-                        child: Text(
-                          'Nickname',
-                          style: TextStyle(
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor),
-                        ),
-                        margin:
-                            EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
-                      ),
-                      Container(
-                        child: Theme(
-                          data: Theme.of(context)
-                              .copyWith(primaryColor: primaryColor),
-                          child: TextField(
+                          child: TextFormField(
+                            minLines: 1,
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
                             decoration: InputDecoration(
-                              hintText: 'Sweetie',
+                              fillColor: Color(0xffaf5dcc),
+                              filled: true,
+                              suffixIcon: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30.0),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30.0),
+                                ),
+                              ),
+                              hintText: 'User Name',
                               contentPadding: new EdgeInsets.all(5.0),
-                              hintStyle: TextStyle(color: greyColor),
+                              hintStyle: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
                             controller: controllerNickname,
                             onChanged: (value) {
@@ -369,33 +394,34 @@ class _ProfileState extends State<Profile> {
                             },
                             focusNode: focusNodeNickname,
                           ),
-                        ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                      ),
-
-                      //Email
-
-                      // About me
+                          margin: EdgeInsets.only(
+                              left: 10.0, right: 10.0, top: 10.0)),
                       Container(
-                        child: Text(
-                          'About me',
-                          style: TextStyle(
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor),
-                        ),
-                        margin:
-                            EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
-                      ),
-                      Container(
-                        child: Theme(
-                          data: Theme.of(context)
-                              .copyWith(primaryColor: primaryColor),
-                          child: TextField(
+                          child: TextFormField(
+                            textAlign: TextAlign.center,
                             decoration: InputDecoration(
-                              hintText: 'Fun, like travel and play PES...',
-                              contentPadding: EdgeInsets.all(5.0),
-                              hintStyle: TextStyle(color: greyColor),
+                              suffixIcon: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                              fillColor: Color(0xffaf5dcc),
+                              filled: true,
+                              hintText: 'About',
+                              contentPadding: new EdgeInsets.all(5.0),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30.0),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color:Color(0xffaf5dcc),
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30.0)),
+                              hintStyle: TextStyle(color: Colors.white),
                             ),
                             controller: controllerAboutMe,
                             onChanged: (value) {
@@ -403,68 +429,69 @@ class _ProfileState extends State<Profile> {
                             },
                             focusNode: focusNodeAboutMe,
                           ),
-                        ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                      ),
+                          margin: EdgeInsets.only(
+                              left: 10.0, right: 10.0, top: 10.0)),
+
                       Container(
-                        child: Text(
-                          'Dog Name',
-                          style: TextStyle(
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor),
-                        ),
-                        margin:
-                            EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
-                      ),
-                      Container(
-                        child: Theme(
-                          data: Theme.of(context)
-                              .copyWith(primaryColor: primaryColor),
-                          child: TextField(
-                            decoration: InputDecoration(
+                        child: TextFormField(
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xffaf5dcc),
+                              suffixIcon: Icon(Icons.edit, color: Colors.white),
                               hintText: 'Dog Name',
                               contentPadding: EdgeInsets.all(5.0),
-                              hintStyle: TextStyle(color: greyColor),
-                            ),
-                            controller: controllerDogName,
-                            onChanged: (value) {
-                              aboutMe = value;
-                            },
-                            focusNode: focusNodeAboutMe,
-                          ),
-                        ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                      ),
-                      Container(
-                        child: Text(
-                          'Zip',
-                          style: TextStyle(
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor),
+                              hintStyle: TextStyle(color: Colors.white),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color:Color(0xffaf5dcc), width: 1.5),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30.0),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: BorderSide(
+                                      color: Color(0xffaf5dcc), width: 1.5))),
+                          controller: controllerDogName,
+                          onChanged: (value) {
+                            aboutMe = value;
+                          },
+                          focusNode: focusNodeAboutMe,
                         ),
                         margin:
-                            EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
+                            EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
                       ),
+
                       Container(
-                        child: Theme(
-                          data: Theme.of(context)
-                              .copyWith(primaryColor: primaryColor),
-                          child: TextField(
-                            decoration: InputDecoration(
+                        child: TextFormField(
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            suffixIcon: Icon(Icons.edit, color: Colors.white),
+                              filled: true,
+                              fillColor: Color(0xffaf5dcc),
                               hintText: 'Zip',
                               contentPadding: EdgeInsets.all(5.0),
-                              hintStyle: TextStyle(color: greyColor),
-                            ),
-                            controller: controllerZip,
-                            onChanged: (value) {
-                              aboutMe = value;
-                            },
-                            focusNode: focusNodeAboutMe,
-                          ),
+                              hintStyle: TextStyle(color: Colors.white),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30.0),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: BorderSide(
+                                      color: Color(0xffaf5dcc), width: 1.5))),
+                          controller: controllerZip,
+                          onChanged: (value) {
+                            aboutMe = value;
+                          },
+                          focusNode: focusNodeAboutMe,
                         ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        margin:
+                            EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
                       ),
                     ],
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -472,10 +499,12 @@ class _ProfileState extends State<Profile> {
                   SizedBox(
                     height: 20,
                   ),
-                  Material(
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Material(
                       elevation: 5.0,
                       borderRadius: BorderRadius.circular(30.0),
-                      color: Color(0xff274986),
+                      color: Color(0xffaf5dcc),
                       child: Container(
                         width: 120.0,
                         height: 50.0,
@@ -485,11 +514,15 @@ class _ProfileState extends State<Profile> {
                           child: Text("SAVE",
                               style: TextStyle(color: Colors.white)),
                         ),
-                      )),
+                      ),
+                    ),
+                  )
                 ],
               ),
-            )
-          ],
-        ));
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
