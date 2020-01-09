@@ -76,425 +76,335 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget build(BuildContext context) {
     var divheight = MediaQuery.of(context).size.height;
     return Scaffold(
-       /* bottomNavigationBar: Container(
-            child: Container(
-          height: 63.0,
-          decoration: new BoxDecoration(
-              borderRadius: new BorderRadius.only(
-                  topLeft: const Radius.circular(0.0),
-                  topRight: const Radius.circular(0.0))),
-          child: Container(
-            decoration: new BoxDecoration(
-                color: Color(0xff905c96),
-                borderRadius: new BorderRadius.only(
-                    topLeft: const Radius.circular(0.0),
-                    topRight: const Radius.circular(0.0))),
-            child: new Center(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                // SizedBox(width: 24.0),
-                Container(
-                  height: 35,
-                  width: 35,
-                  child: Image.asset(
-                    "assets/images/Home.png",
-                    color: Colors.white,
-                  ),
-                ),
-                // SizedBox(width: 40.0),
-                Container(
-                  height: 35,
-                  width: 35,
-                  child: Image.asset(
-                    "assets/images/shopping-cart.png",
-                    color: Colors.white,
-                  ),
-                ),
-                //SizedBox(width: 40.0),
-                Container(
-                  height: 35,
-                  width: 35,
-                  child: Image.asset(
-                    "assets/images/Chat.png",
-                    color: Colors.white.withOpacity(1.0),
-                  ),
-                ),
-                // SizedBox(
-                //   width: 40,
-                // ),
-                Container(
-                  height: 35,
-                  width: 35,
-                  child: Image.asset(
-                    "assets/images/Schedule.png",
-                    color: Colors.white,
-                  ),
-                ),
-                //SizedBox(width: 50),
-                Container(
-                    height: 35,
-                    width: 35,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SettingScreen()),
-                        );
-                      },
-                      child: Icon(
-                        Icons.settings,
-                        color: Colors.white,
-                        size: 40.0,
-                      ),
-                    ))
-              ],
-            )),
-          ),
-        )),*/
         body: Stack(
-          children: <Widget>[
-            NestedScrollView(
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
-                return <Widget>[
-                  SliverAppBar(
-                    expandedHeight: 80.0,
-                    floating: false,
-                    pinned: true,
-                    leading: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.arrow_back_ios),
-                    ),
-                    centerTitle: true,
-                    backgroundColor: Color(0xff905c96),
-                    flexibleSpace: FlexibleSpaceBar(
-                      centerTitle: true,
-                      title: Text(
-                        "Settings",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                        ),
-                      ),
+      children: <Widget>[
+        NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                expandedHeight: 80.0,
+                floating: false,
+                pinned: true,
+                leading: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
+                centerTitle: true,
+                backgroundColor: Color(0xff905c96),
+                flexibleSpace: FlexibleSpaceBar(
+                  centerTitle: true,
+                  title: Text(
+                    "Settings",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
                     ),
                   ),
-                ];
-              },
-              body: Center(
-                  child: SingleChildScrollView(
-                // Optional
-                child: Container(
-                    height: divheight,
-                    color: Color(0xff905c96),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                ),
+              ),
+            ];
+          },
+          body: Center(
+              child: SingleChildScrollView(
+            // Optional
+            child: Container(
+                height: divheight,
+                color: Color(0xff905c96),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.0),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Accounts",
+                              style:
+                                  TextStyle(fontSize: 25, color: Colors.white),
+                            )),
+                      ),
+                      Column(
                         children: <Widget>[
                           Padding(
                             padding: EdgeInsets.only(left: 15.0),
                             child: Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Accounts",
-                                  style: TextStyle(
-                                      fontSize: 25, color: Colors.white),
-                                )),
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: Text(
-                                        "Linked Accounts",
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      ),
-                                    )),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15.0, top: 1.0, right: 15.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              width: 0.7,
-                                              color: Colors.white))),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (assetPDFPath != null) {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PdfViewPage(
-                                                          path: assetPDFPath)));
-                                        }
-                                      },
-                                      child: Text(
-                                        "Privacy",
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      ),
-                                    )),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15.0, top: 3.0, right: 15.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              width: 0.7,
-                                              color: Colors.white))),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    Profile()));
-                                      },
-                                      child: Text(
-                                        "Edit Profile",
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      ),
-                                    )),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15.0, top: 3.0, right: 15.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              width: 0.7,
-                                              color: Colors.white))),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: Text(
-                                        "Push Notification",
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      ),
-                                    )),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15.0, top: 3.0, right: 15.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              width: 0.7,
-                                              color: Colors.white))),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                //crossAxisAlignment: CrossAxisAlignment.end,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 15.0),
-                                    child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: GestureDetector(
-                                          onTap: () {},
-                                          child: Text(
-                                            "2 Factor Authentication",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.white),
-                                          ),
-                                        )),
-                                  ),
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: Switch(
-                                        value: isSwitched,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            isSwitched = value;
-                                          });
-                                        },
-                                        activeTrackColor: Color(0xff98c1ef),
-                                        activeColor: Color(0xff905c96)),
-                                  )
-                                ],
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15.0, top: 0.0, right: 15.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              width: 0.7,
-                                              color: Colors.white))),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        handleSignOut();
-                                      },
-                                      child: Text(
-                                        "Sign Out",
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      ),
-                                    )),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15.0, top: 3.0, right: 15.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              width: 0.7,
-                                              color: Colors.white))),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 15.0),
-                            child: Align(
-                                alignment: Alignment.centerLeft,
                                 child: GestureDetector(
+                                  onTap: () {},
                                   child: Text(
-                                    "Support",
+                                    "Linked Accounts",
                                     style: TextStyle(
                                         fontSize: 20, color: Colors.white),
                                   ),
                                 )),
                           ),
-                          Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: Text(
-                                        "FAQs",
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      ),
-                                    )),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15.0, top: 3.0, right: 15.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              width: 0.7,
-                                              color: Colors.white))),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: GestureDetector(
-                                      onTap: () {},
-                                      child: Text(
-                                        "Report a problems",
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.white),
-                                      ),
-                                    )),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 15.0, top: 3.0, right: 15.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              width: 0.7,
-                                              color: Colors.white))),
-                                ),
-                              ),
-                            ],
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 1.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
                           ),
                         ],
                       ),
-                    )),
-              )),
-            ),
-            Positioned(
-              child: isLoading
-                  ? Container(
-                      child: Center(
-                        child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xfff5a623))),
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (assetPDFPath != null) {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => PdfViewPage(
+                                                  path: assetPDFPath)));
+                                    }
+                                  },
+                                  child: Text(
+                                    "Privacy",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 3.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
+                          ),
+                        ],
                       ),
-                      color: Colors.white.withOpacity(0.8),
-                    )
-                  : Container(),
-            ),
-          ],
-        ));
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Profile()));
+                                  },
+                                  child: Text(
+                                    "Edit Profile",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 3.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {},
+                                  child: Text(
+                                    "Push Notification",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 3.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            //crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.only(left: 15.0),
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: GestureDetector(
+                                      onTap: () {},
+                                      child: Text(
+                                        "2 Factor Authentication",
+                                        style: TextStyle(
+                                            fontSize: 20, color: Colors.white),
+                                      ),
+                                    )),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Switch(
+                                    value: isSwitched,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        isSwitched = value;
+                                      });
+                                    },
+                                    activeTrackColor: Color(0xff98c1ef),
+                                    activeColor: Color(0xff905c96)),
+                              )
+                            ],
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 0.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    handleSignOut();
+                                  },
+                                  child: Text(
+                                    "Sign Out",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 3.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.0),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: GestureDetector(
+                              child: Text(
+                                "Support",
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.white),
+                              ),
+                            )),
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {},
+                                  child: Text(
+                                    "FAQs",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 3.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onTap: () {},
+                                  child: Text(
+                                    "Report a problems",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 3.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )),
+          )),
+        ),
+        Positioned(
+          child: isLoading
+              ? Container(
+                  child: Center(
+                    child: CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Color(0xfff5a623))),
+                  ),
+                  color: Colors.white.withOpacity(0.8),
+                )
+              : Container(),
+        ),
+      ],
+    ));
   }
 }
 

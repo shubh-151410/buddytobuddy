@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../StepCounting.dart';
 import 'package:latlong/latlong.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 
 class Buddynow extends StatefulWidget {
@@ -12,15 +13,35 @@ class Buddynow extends StatefulWidget {
 
 class _BuddynowState extends State<Buddynow> {
   final Distance distance = new Distance();
-
+  Position currentLocation;
+  Geolocator geolocator = Geolocator();
+  double lattitude;
+  double langitude;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    final double km = distance.as(LengthUnit.Kilometer,
-        new LatLng(28.6110336, 77.0941551), new LatLng(28.6657873, 77.3786908));
-    print("@@@@@@@@@@@@@@@@@");
-    print(km);
+
+    getUserLocation();
+  }
+
+  Future<Position> locateUser() {
+    return Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  }
+
+  getUserLocation() async {
+    try {
+      currentLocation = await locateUser();
+      lattitude = currentLocation.latitude;
+      langitude = currentLocation.longitude;
+      setState(() {
+        lattitude = currentLocation.latitude;
+        langitude = currentLocation.longitude;
+      });
+    } on Exception {
+      currentLocation = null;
+    }
   }
 
   @override
@@ -146,21 +167,25 @@ class _BuddynowState extends State<Buddynow> {
                         SizedBox(
                           height: 5.0,
                         ),
-                        Text(
-                          distance
-                                  .as(
-                                    LengthUnit.Kilometer,
-                                    LatLng(28.6110336, 77.0941551),
-                                    LatLng(
-                                        double.tryParse(snapshot.data
-                                            .documents[position]["lattitude"]),
-                                        double.tryParse(snapshot.data
-                                            .documents[position]["longitude"])),
-                                  )
-                                  .toString() +
-                              " Km Away",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        (langitude != null && lattitude != null)
+                            ? Text(
+                                distance
+                                        .as(
+                                          LengthUnit.Kilometer,
+                                          LatLng(lattitude, langitude),
+                                          LatLng(
+                                              double.tryParse(snapshot
+                                                      .data.documents[position]
+                                                  ["lattitude"]),
+                                              double.tryParse(snapshot
+                                                      .data.documents[position]
+                                                  ["longitude"])),
+                                        )
+                                        .toString() +
+                                    " Km Away",
+                                style: TextStyle(color: Colors.white),
+                              )
+                            : Text("Please On GPS ")
                       ],
                     ),
                   ),

@@ -19,18 +19,31 @@ class _SchedulePageState extends State<SchedulePage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Color(0xff905c96),
-            bottom: TabBar(tabs: [
-              Tab(
-                text: "BuddyNow",
-              ),
-              Tab(
-                text: "ScheduleBuddy",
-              )
-            ]),
-          ),
-          body: TabBarView(children: <Widget>[Buddynow(), CustomScheduling()])),
+        appBar: AppBar(
+          backgroundColor: Color(0xff905c96),
+          bottom: TabBar(
+              indicatorColor: Colors.white,
+              unselectedLabelColor: Colors.grey.withOpacity(0.5),
+              tabs: [
+                Container(
+                  child: Tab(
+                    text: "BuddyNow",
+                  ),
+                ),
+                Container(
+                  child: Tab(
+                    text: "ScheduleBuddy",
+                  ),
+                )
+              ]),
+        ),
+        body: TabBarView(
+          children: <Widget>[
+            Buddynow(),
+            CustomScheduling(),
+          ],
+        ),
+      ),
     );
   }
 }

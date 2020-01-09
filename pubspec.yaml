@@ -35,6 +35,8 @@ dependencies:
   # pdftron_flutter:
   #   git:
   #     url: git://github.com/PDFTron/pdftron-flutter.git
+
+  permission: ^0.1.5
   google_maps_flutter: ^0.5.19
   geocoder: ^0.1.1
   geolocator: ^5.0.1
@@ -44,11 +46,13 @@ dependencies:
   cached_network_image: ^2.0.0-rc
   flutter_plugin_pdf_viewer: ^1.0.7
   flutter_pdfview: ^1.0.0+9
-  flutter_local_notifications: ^0.8.4
+  flutter_local_notifications: ^0.9.1
   path_provider: ^1.2.0
   flutter_launcher_icons: ^0.7.2+1
   splashscreen: ^1.2.0
   pedometer: ^1.0.0
+  google_map_polyline: ^0.2.0+1
+  flutter_polyline_points: ^0.1.0
 
   pdftron_flutter:
     git:
@@ -86,7 +90,7 @@ dependencies:
   toast: ^0.1.5
   flutter_dash: ^0.0.1
   latlong: ^0.6.1
-  
+
 
 dev_dependencies:
   flutter_test:
