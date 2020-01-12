@@ -4,13 +4,20 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:pedometer/pedometer.dart';
 import 'package:toast/toast.dart';
+import './map_request.dart';
 
 class StepCounting extends StatefulWidget {
+final double lattitude;
+final double longitude;
+StepCounting({@required this.lattitude,@required this.longitude});
   @override
-  _StepCountingState createState() => _StepCountingState();
+  _StepCountingState createState() => _StepCountingState(destinationlattitude: lattitude,destinationlongitude: longitude);
 }
 
 class _StepCountingState extends State<StepCounting> {
+  final double destinationlattitude;
+  final double destinationlongitude;
+  _StepCountingState({@required this.destinationlattitude,@required this.destinationlongitude});
   Pedometer _pedometer;
   StreamSubscription<int> _subscription;
   String _stepCountValue = '0';
@@ -18,6 +25,9 @@ class _StepCountingState extends State<StepCounting> {
   Completer<GoogleMapController> _controller = Completer();
   double lattitude;
   double langitude;
+   final Set<Polyline> _polyLines = {};
+   final Set<Marker> _markers = {};
+   Set<Polyline> get polyLines => _polyLines;
   LatLng _center;
   Position currentLocation;
   Geolocator geolocator = Geolocator();
@@ -26,6 +36,7 @@ class _StepCountingState extends State<StepCounting> {
     // TODO: implement initState
     super.initState();
     getUserLocation();
+    
     _stepCountValue = '0';
 
     initPlatformState();
@@ -63,6 +74,7 @@ class _StepCountingState extends State<StepCounting> {
       currentLocation = await locateUser();
       lattitude = currentLocation.latitude;
       langitude = currentLocation.longitude;
+      sendRequest(lattitude,langitude);
       setState(() {
         lattitude = currentLocation.latitude;
         langitude = currentLocation.longitude;
@@ -70,6 +82,68 @@ class _StepCountingState extends State<StepCounting> {
     } on Exception {
       currentLocation = null;
     }
+  }
+
+ 
+
+   void sendRequest(double originlatitide,double originlongitude) async {
+    LatLng destination = LatLng(20.008751, 73.780037);
+    String route = await GoogleMapsServices().getRouteCoordinates(originlatitide, originlongitude, destinationlattitude, destinationlongitude);
+    createRoute(route);
+    _addMarker(LatLng(destinationlattitude,destinationlongitude),"KTHM Collage");
+  }
+  void createRoute(String encondedPoly) {
+    _polyLines.add(Polyline(
+        polylineId: PolylineId("a"),
+        width: 4,
+        points: _convertToLatLng(_decodePoly(encondedPoly)),
+        color: Colors.black));
+  }
+  void _addMarker(LatLng location, String address) {
+    _markers.add(Marker(
+      markerId: MarkerId("112"),
+        position: location,
+        infoWindow: InfoWindow(title: address, snippet: "go here"),
+        icon: BitmapDescriptor.defaultMarker));
+  }
+   List<LatLng> _convertToLatLng(List points) {
+    List<LatLng> result = <LatLng>[];
+    for (int i = 0; i < points.length; i++) {
+      if (i % 2 != 0) {
+        result.add(LatLng(points[i - 1], points[i]));
+      }
+    }
+    return result;
+  }
+
+   List _decodePoly(String poly) {
+    var list = poly.codeUnits;
+    var lList = new List();
+    int index = 0;
+    int len = poly.length;
+    int c = 0;
+     do {
+      var shift = 0;
+      int result = 0;
+
+      do {
+        c = list[index] - 63;
+        result |= (c & 0x1F) << (shift * 5);
+        index++;
+        shift++;
+      } while (c >= 32);
+       if (result & 1 == 1) {
+        result = ~result;
+      }
+      var result1 = (result >> 1) * 0.00001;
+      lList.add(result1);
+    } while (index < len);
+
+     for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
+
+    print(lList.toString());
+
+    return lList;
   }
 
   @override
@@ -161,7 +235,7 @@ class _StepCountingState extends State<StepCounting> {
     if (lattitude != null && langitude != null) {
       return GoogleMap(
         mapType: MapType.normal,
-        trafficEnabled: true,
+        trafficEnabled: false,
       
         initialCameraPosition:
             CameraPosition(target: LatLng(lattitude, langitude), zoom: 20.0),
@@ -172,14 +246,9 @@ class _StepCountingState extends State<StepCounting> {
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
         },
-        markers: Set<Marker>.of(<Marker>[
-          Marker(
-              visible: true,
-              draggable: true,
-              position: LatLng(lattitude, langitude),
-              markerId: MarkerId("1"),
-              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),)
-        ]),
+        polylines: polyLines,
+         markers: _markers,
+      
       );
     } else {
       return CircularProgressIndicator(

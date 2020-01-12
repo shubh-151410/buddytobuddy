@@ -156,11 +156,12 @@ class _InformationState extends State<Information> {
   Future<void> profileDialogInfo(
       String name, String photoUrl, String about) async {
     return showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return customDialog(name, photoUrl, about);
-        });
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return customDialog(name, photoUrl, about);
+      },
+    );
   }
 }
 

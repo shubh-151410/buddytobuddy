@@ -60,7 +60,7 @@
         </activity>
         <meta-data
         android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyA4KzNZ1mscDl_Ey-IIBECGFZ6_KEOdCUk"/>
+        android:value="AIzaSyApMbLB6PtNjANdl0eaSWfEdQ8zmDFyEDw"/>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"

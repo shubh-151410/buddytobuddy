@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../StepCounting.dart';
+import '../MainMap/StepCounting.dart';
 import 'package:latlong/latlong.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
@@ -138,7 +138,14 @@ class _BuddynowState extends State<Buddynow> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => StepCounting()),
+                        MaterialPageRoute(
+                          builder: (context) => StepCounting(
+                            lattitude: double.tryParse(
+                                snapshot.data.documents[position]["lattitude"]),
+                            longitude: double.tryParse(
+                                snapshot.data.documents[position]["longitude"]),
+                          ),
+                        ),
                       );
                     },
                     child: Column(
