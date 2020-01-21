@@ -57,35 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  getsomePoints() async {
-    var permissions =
-        await Permission.getPermissionsStatus([PermissionName.Location]);
-    if (permissions[0].permissionStatus == PermissionStatus.notAgain) {
-      var askpermissions =
-          await Permission.requestPermissions([PermissionName.Location]);
-    } else {
-      routeCoords = await _googleMapPolyline.getCoordinatesWithLocation(
-          origin: LatLng(40.6782, -73.9442),
-          destination: LatLng(40.6944, -73.9212),
-          mode: RouteMode.driving);
-    }
-  }
-
-  _getPolylinesWithLocation() async {
-    _setLoadingMenu(true);
-    List<LatLng> _coordinates =
-        await _googleMapPolyline.getCoordinatesWithLocation(
-            origin: _originLocation,
-            destination: _destinationLocation,
-            mode: RouteMode.driving);
-
-    setState(() {
-      _polylines.clear();
-    });
-    _addPolyline(_coordinates);
-    _setLoadingMenu(false);
-  }
-
   double lattitude;
   double langitude;
 
@@ -102,22 +73,6 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     getUserLocation();
-    getsomePoints();
-  }
-
-  _getPolylinesWithAddress() async {
-    _setLoadingMenu(true);
-    List<LatLng> _coordinates =
-        await _googleMapPolyline.getPolylineCoordinatesWithAddress(
-            origin: '55 Kingston Ave, Brooklyn, NY 11213, USA',
-            destination: '8007 Cypress Ave, Glendale, NY 11385, USA',
-            mode: RouteMode.walking);
-
-    setState(() {
-      _polylines.clear();
-    });
-    _addPolyline(_coordinates);
-    _setLoadingMenu(false);
   }
 
   _addPolyline(List<LatLng> _coordinates) {
@@ -205,24 +160,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
               },
             ),
-            Positioned(
-              top: 50,
-              right: 30,
-              child: Align(
-                  child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  RaisedButton(
-                    child: Text('Polylines wtih Location'),
-                    onPressed: _getPolylinesWithLocation,
-                  ),
-                  RaisedButton(
-                    child: Text('Polylines wtih Address'),
-                    onPressed: _getPolylinesWithAddress,
-                  ),
-                ],
-              )),
-            )
           ],
         ),
       ),
@@ -232,15 +169,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void onMapCreated(GoogleMapController controller) {
     setState(() {
       _controller = controller;
-
-      polyline.add(Polyline(
-          polylineId: PolylineId('route1'),
-          visible: true,
-          points: routeCoords,
-          width: 4,
-          color: Colors.blue,
-          startCap: Cap.roundCap,
-          endCap: Cap.buttCap));
     });
   }
 

@@ -7,17 +7,20 @@ import 'package:toast/toast.dart';
 import './map_request.dart';
 
 class StepCounting extends StatefulWidget {
-final double lattitude;
-final double longitude;
-StepCounting({@required this.lattitude,@required this.longitude});
+  final double lattitude;
+  final double longitude;
+  StepCounting({@required this.lattitude, @required this.longitude});
   @override
-  _StepCountingState createState() => _StepCountingState(destinationlattitude: lattitude,destinationlongitude: longitude);
+  _StepCountingState createState() => _StepCountingState(
+      destinationlattitude: lattitude, destinationlongitude: longitude);
 }
 
 class _StepCountingState extends State<StepCounting> {
   final double destinationlattitude;
   final double destinationlongitude;
-  _StepCountingState({@required this.destinationlattitude,@required this.destinationlongitude});
+  _StepCountingState(
+      {@required this.destinationlattitude,
+      @required this.destinationlongitude});
   Pedometer _pedometer;
   StreamSubscription<int> _subscription;
   String _stepCountValue = '0';
@@ -25,9 +28,9 @@ class _StepCountingState extends State<StepCounting> {
   Completer<GoogleMapController> _controller = Completer();
   double lattitude;
   double langitude;
-   final Set<Polyline> _polyLines = {};
-   final Set<Marker> _markers = {};
-   Set<Polyline> get polyLines => _polyLines;
+  final Set<Polyline> _polyLines = {};
+  final List<Marker> _markers = List();
+  Set<Polyline> get polyLines => _polyLines;
   LatLng _center;
   Position currentLocation;
   Geolocator geolocator = Geolocator();
@@ -36,7 +39,7 @@ class _StepCountingState extends State<StepCounting> {
     // TODO: implement initState
     super.initState();
     getUserLocation();
-    
+
     _stepCountValue = '0';
 
     initPlatformState();
@@ -74,7 +77,7 @@ class _StepCountingState extends State<StepCounting> {
       currentLocation = await locateUser();
       lattitude = currentLocation.latitude;
       langitude = currentLocation.longitude;
-      sendRequest(lattitude,langitude);
+      await sendRequest(lattitude, langitude);
       setState(() {
         lattitude = currentLocation.latitude;
         langitude = currentLocation.longitude;
@@ -84,29 +87,36 @@ class _StepCountingState extends State<StepCounting> {
     }
   }
 
- 
+  Future sendRequest(double originlatitide, double originlongitude) async {
+    String route = await GoogleMapsServices().getRouteCoordinates(
+        originlatitide,
+        originlongitude,
+        destinationlattitude,
+        destinationlongitude);
+    await createRoute(route);
+    // _addMarker(
+    //     LatLng(destinationlattitude, destinationlongitude), "KTHM Collage");
+  }
 
-   void sendRequest(double originlatitide,double originlongitude) async {
-    LatLng destination = LatLng(20.008751, 73.780037);
-    String route = await GoogleMapsServices().getRouteCoordinates(originlatitide, originlongitude, destinationlattitude, destinationlongitude);
-    createRoute(route);
-    _addMarker(LatLng(destinationlattitude,destinationlongitude),"KTHM Collage");
+  Future createRoute(String encondedPoly) async {
+    _polyLines.add(
+      Polyline(
+          polylineId: PolylineId("a"),
+          width: 4,
+          visible: true,
+          points: _convertToLatLng(_decodePoly(encondedPoly)),
+          color: Colors.black),
+    );
   }
-  void createRoute(String encondedPoly) {
-    _polyLines.add(Polyline(
-        polylineId: PolylineId("a"),
-        width: 4,
-        points: _convertToLatLng(_decodePoly(encondedPoly)),
-        color: Colors.black));
-  }
+
   void _addMarker(LatLng location, String address) {
     _markers.add(Marker(
-      markerId: MarkerId("112"),
+        markerId: MarkerId("112"),
         position: location,
-        infoWindow: InfoWindow(title: address, snippet: "go here"),
         icon: BitmapDescriptor.defaultMarker));
   }
-   List<LatLng> _convertToLatLng(List points) {
+
+  List<LatLng> _convertToLatLng(List points) {
     List<LatLng> result = <LatLng>[];
     for (int i = 0; i < points.length; i++) {
       if (i % 2 != 0) {
@@ -116,13 +126,13 @@ class _StepCountingState extends State<StepCounting> {
     return result;
   }
 
-   List _decodePoly(String poly) {
+  List _decodePoly(String poly) {
     var list = poly.codeUnits;
     var lList = new List();
     int index = 0;
     int len = poly.length;
     int c = 0;
-     do {
+    do {
       var shift = 0;
       int result = 0;
 
@@ -132,14 +142,14 @@ class _StepCountingState extends State<StepCounting> {
         index++;
         shift++;
       } while (c >= 32);
-       if (result & 1 == 1) {
+      if (result & 1 == 1) {
         result = ~result;
       }
       var result1 = (result >> 1) * 0.00001;
       lList.add(result1);
     } while (index < len);
 
-     for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
+    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
 
     print(lList.toString());
 
@@ -158,9 +168,10 @@ class _StepCountingState extends State<StepCounting> {
             child: Opacity(
               opacity: 0.8,
               child: InkWell(
-                onTap: (){
+                onTap: () {
                   stopListening();
-                  Toast.show("Buddy Stop", context,duration: Toast.LENGTH_SHORT,gravity:Toast.BOTTOM );
+                  Toast.show("Buddy Stop", context,
+                      duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
                 },
                 child: ClipOval(
                   child: Container(
@@ -200,9 +211,9 @@ class _StepCountingState extends State<StepCounting> {
                       Text(
                         "$_stepCountValue",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            ),
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
                       )
                     ],
                   ),
@@ -232,28 +243,34 @@ class _StepCountingState extends State<StepCounting> {
 
   Widget googlemap() {
     GoogleMapController mapController;
-    if (lattitude != null && langitude != null) {
+    if (lattitude != null && langitude != null && polyLines != null) {
       return GoogleMap(
-        mapType: MapType.normal,
-        trafficEnabled: false,
-      
-        initialCameraPosition:
-            CameraPosition(target: LatLng(lattitude, langitude), zoom: 20.0),
-        zoomGesturesEnabled: true,
-        compassEnabled: true,
-        
-        mapToolbarEnabled: true,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-        polylines: polyLines,
-         markers: _markers,
-      
-      );
+          mapType: MapType.normal,
+          scrollGesturesEnabled: true,
+          rotateGesturesEnabled: true,
+          
+          trafficEnabled: false,
+          initialCameraPosition:
+              CameraPosition(target: LatLng(lattitude, langitude), zoom: 20.0),
+          zoomGesturesEnabled: true,
+          compassEnabled: true,
+          mapToolbarEnabled: true,
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+          },
+          polylines: polyLines,
+          markers: Set<Marker>.of(<Marker>[
+            Marker(
+                markerId: MarkerId("112"),
+                position: LatLng(destinationlattitude, destinationlongitude),
+                icon: BitmapDescriptor.defaultMarker),
+            Marker(
+                markerId: MarkerId("abc"),
+                position: LatLng(lattitude, langitude),
+                icon: BitmapDescriptor.defaultMarker)
+          ]));
     } else {
-      return CircularProgressIndicator(
-        strokeWidth: 1.0,
-      );
+      return Center(child: CircularProgressIndicator());
     }
   }
 

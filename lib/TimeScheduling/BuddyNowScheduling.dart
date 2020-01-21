@@ -78,9 +78,15 @@ class _BuddynowState extends State<Buddynow> {
           child: InkWell(
             onTap: () {
               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => StepCounting()),
-              );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StepCounting(
+                      lattitude: double.tryParse(
+                          snapshot.data.documents[position]["lattitude"]),
+                      longitude: double.tryParse(
+                          snapshot.data.documents[position]["longitude"]),
+                    ),
+                  ));
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
