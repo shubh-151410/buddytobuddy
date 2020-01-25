@@ -185,7 +185,7 @@ class _NewLogInState extends State<NewLogIn> {
       final GoogleSignInAccount googleUser = await _googlSignIn.signIn();
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-      print(googleUser);
+      
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -214,6 +214,7 @@ class _NewLogInState extends State<NewLogIn> {
           'DogName': null,
           'Zip': null
         });
+        
         currentUser = users;
         await prefs.setString('id', currentUser.uid);
         await prefs.setString('name', currentUser.displayName);
