@@ -1,3 +1,4 @@
+import 'package:BuddyToBody/chat.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,8 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<PolylineId, Polyline> _polylines = <PolylineId, Polyline>{};
   GoogleMapController _controller;
   List<LatLng> routeCoords;
-  GoogleMapPolyline _googleMapPolyline =
-      new GoogleMapPolyline(apiKey: "AIzaSyApMbLB6PtNjANdl0eaSWfEdQ8zmDFyEDw");
+  
 
   //Polyline patterns
   List<List<PatternItem>> patterns = <List<PatternItem>>[
@@ -44,11 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       PatternItem.gap(20.0)
     ],
   ];
-  LatLng _mapInitLocation = LatLng(40.683337, -73.940432);
-
-  LatLng _originLocation = LatLng(40.677939, -73.941755);
-  LatLng _destinationLocation = LatLng(40.698432, -73.924038);
-
+ 
   bool _loading = false;
 
   _onMapCreated(GoogleMapController controller) {
@@ -215,11 +211,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: BitmapDescriptor.fromAsset(
                         "assets/images/index_Recovered.png"),
                     onTap: () {
-                      print(snapshot.data.documents[i]["About"]);
+                    
                       profileDialogInfo(
                           snapshot.data.documents[i]["name"],
                           snapshot.data.documents[i]["photoUrl"],
-                          snapshot.data.documents[i]["About"]);
+                          snapshot.data.documents[i]["About"],
+                          snapshot.data.documents[i]["id"],
+                          snapshot.data.documents[i]["photourl"]);
                     },
                   ),
             ],
@@ -232,12 +230,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> profileDialogInfo(
-      String name, String photoUrl, String about) async {
+      String name, String photoUrl, String about,String id,String photourl) async {
     return showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return customDialog(name, photoUrl, about);
+          return customDialog(name, photoUrl, about,id,photourl);
         });
   }
 }
@@ -246,11 +244,15 @@ class customDialog extends StatefulWidget {
   static String userName;
   static String userphotoUrl;
   static String About;
+  static String iD;
+  static String photoUrl;
 
-  customDialog(String name, String photoUrl, String about) {
+  customDialog(String name, String photoUrl, String about,String id,String photourl) {
     userName = name;
     userphotoUrl = photoUrl;
     About = about;
+    iD = id;
+    photoUrl = photourl;
   }
 
   @override
@@ -391,7 +393,32 @@ class _customDialogState extends State<customDialog> {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
               ),
-            )
+            ),
+            SizedBox(
+              height: 10,
+            ),
+           (true)?InkWell(
+             onTap: (){
+               Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                     Chat(
+                  peerId: customDialog.iD,
+                  peerAvatar: customDialog.photoUrl,
+                ),),
+                              (Route<dynamic> route) => false);
+             },
+             child: Container(
+             
+               decoration: BoxDecoration(
+                  color: Colors.grey,
+                 shape:BoxShape.rectangle,
+                 borderRadius: BorderRadius.circular(10.0)
+               ),
+               child: Text("Chat",style: TextStyle(fontSize: 20,color: Colors.white),),
+             ),
+           ):Container(),
           ],
         ),
       ),

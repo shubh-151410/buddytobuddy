@@ -28,24 +28,21 @@ class _ScheduleBuddyState extends State<ScheduleBuddy> {
       body: Stack(
         children: <Widget>[
           Center(
-            child: SingleChildScrollView(
-              child: Container(
-                color: Color(0xff905c96),
-                height: MediaQuery.of(context).size.height,
-                child: Center(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: Firestore.instance.collection('users').snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasData) {
-                        return buildWidget(context, snapshot);
-                      } else {
-                        return Container(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    },
-                  ),
+            child: Container(
+              color: Color(0xff905c96),
+              child: Center(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: Firestore.instance.collection('users').snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      return buildWidget(context, snapshot);
+                    } else {
+                      return Container(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
                 ),
               ),
             ),
@@ -66,7 +63,7 @@ class _ScheduleBuddyState extends State<ScheduleBuddy> {
           left: 20.0,
           right: 20.0,
         ),
-        height: 60,
+       
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
             color: Color(0xfff2e3ea),
