@@ -15,29 +15,70 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
+  final String name;
 
-  Chat({Key key, this.peerId, this.peerAvatar})
-      : super(key: key);
+  Chat({Key key, this.peerId, this.peerAvatar, this.name}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        elevation: 0,
+        elevation: 5,
         backgroundColor: Color(0xff905c96),
         title: new Text(
           'CHAT',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back_ios),
+        actions: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(right: 10, top: 10),
+            child: Row(
+              children: <Widget>[
+                Text(
+                  name,
+                  style: TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                SizedBox(width: 3.0,),
+                Container(
+                  height: 10,
+                  width: 10,
+                  child: Text(""),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(40)
+                  ),
+                )
+                
+              ],
+            ),
+          )
+        ],
+        leading: Padding(
+          padding: const EdgeInsets.all(0.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(Icons.arrow_back_ios),
+              ),
+
+              //  (peerAvatar!=null)?
+              //   Image.network(peerAvatar,height: 2,width: 2,)
+
+              //             :Icon(Icons.account_circle,
+              //               size: 10.0, color: Colors.grey)
+            ],
+          ),
         ),
       ),
       body: ChatScreen(
         peerId: peerId,
         peerAvatar: peerAvatar,
+        name: name,
       ),
     );
   }
@@ -46,8 +87,13 @@ class Chat extends StatelessWidget {
 class ChatScreen extends StatefulWidget {
   final String peerId;
   final String peerAvatar;
+  final String name;
 
-  ChatScreen({Key key, @required this.peerId, @required this.peerAvatar})
+  ChatScreen(
+      {Key key,
+      @required this.peerId,
+      @required this.peerAvatar,
+      @required this.name})
       : super(key: key);
 
   @override
@@ -86,6 +132,7 @@ class ChatScreenState extends State<ChatScreen> {
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
+    
 
     readLocal();
   }
@@ -513,32 +560,37 @@ class ChatScreenState extends State<ChatScreen> {
           // Edit text
           Flexible(
             child: Container(
-              margin: EdgeInsets.only(left: 5.0, right: 5.0,bottom: 3.0),
+              margin: EdgeInsets.only(left: 5.0, right: 5.0, bottom: 8.0),
               child: TextFormField(
+               
                 style: TextStyle(color: primaryColor, fontSize: 15.0),
                 controller: textEditingController,
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.0,color: Color(0xffcc83e7)),
+                      borderSide:
+                          BorderSide(width: 1.0, color: Color(0xffcc83e7)),
                       borderRadius: BorderRadius.circular(30.0)),
                   fillColor: Color(0xffcc83e7),
                   filled: true,
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1.0,color: Color(0xffcc83e7)),
+                      borderSide:
+                          BorderSide(width: 1.0, color: Color(0xffcc83e7)),
                       borderRadius: BorderRadius.circular(30.0)),
                   hintText: 'Say hi to Your Friend',
-                  hintStyle: TextStyle(color: Colors.white),
+                  hintStyle: TextStyle(
+                    color: Colors.white,
+                  ),
                 ),
                 focusNode: focusNode,
               ),
             ),
           ),
           Container(
-            margin: EdgeInsets.only(bottom: 3.0,right: 5.0),
+            margin: EdgeInsets.only(bottom: 10.0, right: 8.0),
             child: ClipOval(
               child: Container(
                 //margin: EdgeInsets.all(5.0),
-                
+
                 color: Color(0xffaf5dcc),
                 child: IconButton(
                   icon: Icon(Icons.send),

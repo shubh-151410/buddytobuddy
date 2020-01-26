@@ -2,6 +2,11 @@ import 'package:BuddyToBody/chat.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:flutter/material.dart";
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+
 
 import 'SettingUi.dart';
 
@@ -12,6 +17,22 @@ class ScheduleBuddy extends StatefulWidget {
 }
 
 class _ScheduleBuddyState extends State<ScheduleBuddy> {
+   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    final FirebaseMessaging _fcm = FirebaseMessaging();
+    
+    
+
+   @override
+   void initState() { 
+     super.initState();
+     
+     
+   }
+
+    _saveDeviceToken() async {
+       String fcmToken = await _fcm.getToken();
+
+    }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,6 +101,7 @@ class _ScheduleBuddyState extends State<ScheduleBuddy> {
                 builder: (context) => Chat(
                   peerId: snapshot.data.documents[position]["id"],
                   peerAvatar: snapshot.data.documents[position]['photoUrl'],
+                  name: snapshot.data.documents[position]['name'],
                 ),
               ),
             ),
@@ -105,7 +127,7 @@ class _ScheduleBuddyState extends State<ScheduleBuddy> {
                         )
                       : Icon(Icons.account_circle,
                           size: 50.0, color: Colors.grey),
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  borderRadius: BorderRadius.all(Radius.circular(25.0),),
                   clipBehavior: Clip.hardEdge,
                 ),
                 SizedBox(
@@ -124,4 +146,15 @@ class _ScheduleBuddyState extends State<ScheduleBuddy> {
       ),
     );
   }
+}
+
+@immutable
+class Message {
+  final String title;
+  final String body;
+
+  const Message({
+    @required this.title,
+    @required this.body,
+  });
 }

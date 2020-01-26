@@ -212,7 +212,8 @@ class _NewLogInState extends State<NewLogIn> {
           'chattingWith': null,
           'About': null,
           'DogName': null,
-          'Zip': null
+          'Zip': null,
+          'isActive':false,
         });
         
         currentUser = users;

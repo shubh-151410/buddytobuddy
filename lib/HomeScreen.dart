@@ -9,6 +9,7 @@ import 'package:google_map_polyline/google_map_polyline.dart';
 import 'dart:async';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:permission/permission.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const double CAMERA_ZOOM = 13;
 const double CAMERA_TILT = 0;
@@ -31,20 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<LatLng> routeCoords;
   
 
-  //Polyline patterns
-  List<List<PatternItem>> patterns = <List<PatternItem>>[
-    <PatternItem>[], //line
-    <PatternItem>[PatternItem.dash(30.0), PatternItem.gap(20.0)], //dash
-    <PatternItem>[PatternItem.dot, PatternItem.gap(10.0)], //dot
-    <PatternItem>[
-      //dash-dot
-      PatternItem.dash(30.0),
-      PatternItem.gap(20.0),
-      PatternItem.dot,
-      PatternItem.gap(20.0)
-    ],
-  ];
- 
+  bool isActive = false;
   bool _loading = false;
 
   _onMapCreated(GoogleMapController controller) {
@@ -58,6 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   double zoomvalue = 12;
   Position currentLocation;
+   SharedPreferences prefs;
+   String id;
 
   Geolocator geolocator = Geolocator();
   // Completer<GoogleMapController> _controller = Completer();
@@ -69,23 +59,30 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     getUserLocation();
+    isActive = true;
+    readlocal();
+    Firestore.instance.collection('users').document(id).updateData({'isActive':isActive});
+  }
+  readlocal() async{
+     prefs = await SharedPreferences.getInstance();
+      id = prefs.getString('id');
   }
 
-  _addPolyline(List<LatLng> _coordinates) {
-    PolylineId id = PolylineId("poly$_polylineCount");
-    Polyline polyline = Polyline(
-        polylineId: id,
-        patterns: patterns[0],
-        color: Colors.blueAccent,
-        points: _coordinates,
-        width: 10,
-        onTap: () {});
+  // _addPolyline(List<LatLng> _coordinates) {
+  //   PolylineId id = PolylineId("poly$_polylineCount");
+  //   Polyline polyline = Polyline(
+  //       polylineId: id,
+  //       patterns: patterns[0],
+  //       color: Colors.blueAccent,
+  //       points: _coordinates,
+  //       width: 10,
+  //       onTap: () {});
 
-    setState(() {
-      _polylines[id] = polyline;
-      _polylineCount++;
-    });
-  }
+  //   setState(() {
+  //     _polylines[id] = polyline;
+  //     _polylineCount++;
+  //   });
+  // }
 
   _setLoadingMenu(bool _status) {
     setState(() {
@@ -406,17 +403,19 @@ class _customDialogState extends State<customDialog> {
                                      Chat(
                   peerId: customDialog.iD,
                   peerAvatar: customDialog.photoUrl,
+                  name: customDialog.userName,
                 ),),
                               (Route<dynamic> route) => false);
              },
              child: Container(
-             
+               height: 60,
+               width: 60,
                decoration: BoxDecoration(
                   color: Colors.grey,
                  shape:BoxShape.rectangle,
-                 borderRadius: BorderRadius.circular(10.0)
+                 borderRadius: BorderRadius.circular(40.0)
                ),
-               child: Text("Chat",style: TextStyle(fontSize: 20,color: Colors.white),),
+               child: Center(child: Text("Chat",style: TextStyle(fontSize: 20,color: Colors.white),)),
              ),
            ):Container(),
           ],

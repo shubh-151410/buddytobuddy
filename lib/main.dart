@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './login.dart';
+
 import 'package:splashscreen/splashscreen.dart';
 import './mapScreen.dart';
 
@@ -12,6 +13,7 @@ void main() {
       bottomAppBarColor:  Color(0xff905c96),
     
     ),
+    
     home: new SplashScreen(),
     routes: <String, WidgetBuilder>{
       '/HomeScreen': (BuildContext context) => new LogIn()

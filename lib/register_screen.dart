@@ -136,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen>
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       final String Url = await taskSnapshot.ref.getDownloadURL();
       FirebaseUser user = await _auth.currentUser();
-      Map<String, String> data = <String, String>{
+      Map<String, dynamic> data = <String, dynamic>{
         "name": name,
         "email": email,
         "password": password,
@@ -148,7 +148,9 @@ class _HomeScreenState extends State<HomeScreen>
         "longitude": langitude.toString(),
         "photoUrl": Url,
         'chattingWith': null,
-        'id': null
+        'id': null,
+        'isActive':false
+        
       };
 
       var userId = await Firestore.instance.collection('users').add(data);

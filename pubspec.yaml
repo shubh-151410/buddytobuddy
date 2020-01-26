@@ -53,6 +53,7 @@ dependencies:
   pedometer: ^1.0.0
   google_map_polyline: ^0.2.0+1
   flutter_polyline_points: ^0.1.0
+  firebase_messaging: ^6.0.9
 
   pdftron_flutter:
     git:
@@ -85,7 +86,7 @@ dependencies:
   fluttertoast: ^3.1.0
   firebase_storage: 3.0.3
   flutter_twitter_login: ^1.1.0
-  firebase_messaging: 5.1.2
+  
   intl: ^0.16.0
   toast: ^0.1.5
   flutter_dash: ^0.0.1
