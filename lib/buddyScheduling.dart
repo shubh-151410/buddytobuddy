@@ -44,10 +44,7 @@ class _BuddySchedulingState extends State<BuddyScheduling> {
        backgroundColor: Color(0xff905c96),
         title: Text("Schedule Buddy"),
         centerTitle: true,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back_ios),
-        ),
+        leading:Text("")
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,

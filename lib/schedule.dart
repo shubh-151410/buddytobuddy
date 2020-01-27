@@ -29,22 +29,16 @@ class _ScheduleBuddyState extends State<ScheduleBuddy> {
      
    }
 
-    _saveDeviceToken() async {
-       String fcmToken = await _fcm.getToken();
-
-    }
+   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xff905c96),
-        title: Text("People Around You"),
+        title: Text("People Around Us"),
         centerTitle: true,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back_ios),
-        ),
+        leading: Text("")
       ),
       body: Stack(
         children: <Widget>[
@@ -146,7 +140,28 @@ class _ScheduleBuddyState extends State<ScheduleBuddy> {
       ),
     );
   }
+
+  //  _saveDeviceToken() async {
+  //      String fcmToken = await _fcm.getToken();
+
+    
+  //    if (fcmToken != null) {
+  //     var tokens = Firebase.instance
+  //         .collection('users')
+  //         .document(uid)
+  //         .collection('tokens')
+  //         .document(fcmToken);
+
+  //     await tokens.setData({
+  //       'token': fcmToken,
+  //       'createdAt': FieldValue.serverTimestamp(), // optional
+  //       'platform': Platform.operatingSystem // optional
+  //     });
+  //    }
+
+
 }
+
 
 @immutable
 class Message {

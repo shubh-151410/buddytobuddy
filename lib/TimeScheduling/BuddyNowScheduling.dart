@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,6 +18,9 @@ class _BuddynowState extends State<Buddynow> {
   Geolocator geolocator = Geolocator();
   double lattitude;
   double langitude;
+   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    final FirebaseMessaging _fcm = FirebaseMessaging();
+    
   @override
   void initState() {
     // TODO: implement initState
@@ -42,6 +46,8 @@ class _BuddynowState extends State<Buddynow> {
     } on Exception {
       currentLocation = null;
     }
+
+
   }
 
   @override
@@ -160,7 +166,7 @@ class _BuddynowState extends State<Buddynow> {
                         Align(
                           alignment: Alignment.topRight,
                           child: Container(
-                            padding: EdgeInsets.all(5.0),
+                            padding: EdgeInsets.all(10),
                             child: Center(
                               child: Text(
                                 "Request",
@@ -169,9 +175,9 @@ class _BuddynowState extends State<Buddynow> {
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
-                            width: 90.0,
+                          
                             decoration: BoxDecoration(
-                                color: Colors.grey,
+                                color: Colors.white.withOpacity(0.2),
                                 shape: BoxShape.rectangle,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20))),
@@ -198,7 +204,7 @@ class _BuddynowState extends State<Buddynow> {
                                     " Km Away",
                                 style: TextStyle(color: Colors.white),
                               )
-                            : Text("Please On GPS ")
+                            : Text("Waiting...")
                       ],
                     ),
                   ),

@@ -411,7 +411,7 @@ class _customDialogState extends State<customDialog> {
                height: 60,
                width: 60,
                decoration: BoxDecoration(
-                  color: Colors.grey,
+                  color: Colors.white.withOpacity(0.2),
                  shape:BoxShape.rectangle,
                  borderRadius: BorderRadius.circular(40.0)
                ),

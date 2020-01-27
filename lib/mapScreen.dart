@@ -4,6 +4,7 @@ import 'package:BuddyToBody/SettingUi.dart';
 import 'package:BuddyToBody/chat.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -29,6 +30,8 @@ class _InformationState extends State<Information> {
   String id;
   SharedPreferences prefs;
   Geolocator geolocator = Geolocator();
+  final Firestore _db = Firestore.instance;
+  final FirebaseMessaging _fcm = FirebaseMessaging();
   Completer<GoogleMapController> _controller = Completer();
 
   TextEditingController controllerAddress = TextEditingController();
@@ -50,16 +53,45 @@ class _InformationState extends State<Information> {
 
     getUserLocation();
 //    getUserData();
-  readlocal();
-   
+    readlocal();
+    _fcm.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: ListTile(
+              title: Text(message['notification']['title']),
+              subtitle: Text(message['notification']['body']),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        // TODO optional
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        // TODO optional
+      },
+    );
   }
 
-  readlocal() async{
-     prefs = await SharedPreferences.getInstance();
-      id = prefs.getString('id');
-      await  Firestore.instance.collection('users').document(id).updateData({'isActive':true});
+  readlocal() async {
+    prefs = await SharedPreferences.getInstance();
+    id = prefs.getString('id');
+    await Firestore.instance
+        .collection('users')
+        .document(id)
+        .updateData({'isActive': true});
   }
-  
 
   Future<Position> locateUser() {
     return Geolocator()
@@ -117,5 +149,4 @@ class _InformationState extends State<Information> {
       body: _children[_currentIndex],
     );
   }
-
 }

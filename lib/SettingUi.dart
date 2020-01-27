@@ -85,10 +85,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 expandedHeight: 80.0,
                 floating: false,
                 pinned: true,
-                leading: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.arrow_back_ios),
-                ),
+                leading: Text(""),
                 centerTitle: true,
                 backgroundColor: Color(0xff905c96),
                 flexibleSpace: FlexibleSpaceBar(

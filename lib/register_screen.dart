@@ -5,6 +5,7 @@ import 'package:BuddyToBody/SettingUi.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,9 @@ class _HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin, ImagePickerListener {
   GlobalKey<FormState> _key = new GlobalKey();
   bool _validate = false;
+   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+
 
   File _image;
   AnimationController _controller;
@@ -130,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final FirebaseAuth _auth = FirebaseAuth.instance;
       final Firestore _firestore = Firestore.instance;
+       String fcmToken = await _fcm.getToken();
       StorageReference firebaseStorageRef =
           FirebaseStorage.instance.ref().child("UserPhoto");
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
@@ -159,6 +164,20 @@ class _HomeScreenState extends State<HomeScreen>
           .collection('users')
           .document(userId.documentID)
           .updateData({'id': '${userId.documentID}'});
+
+           if (fcmToken != null) {
+          var tokens = Firestore.instance
+              .collection('users')
+              .document(userId.documentID)
+              .collection('tokens')
+              .document(fcmToken);
+
+          await tokens.setData({
+            'token': fcmToken,
+            'createdAt': FieldValue.serverTimestamp(), // optional
+            // optional
+          });
+        }
 
       Navigator.push(
         context,

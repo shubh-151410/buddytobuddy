@@ -4,6 +4,7 @@ import 'package:BuddyToBody/mapScreen.dart';
 import 'package:BuddyToBody/password.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
@@ -56,6 +57,8 @@ class _NewLogInState extends State<NewLogIn> {
   LatLng _center;
   bool isPasswordRight = false;
   bool gpsEnabled;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _fcm = FirebaseMessaging();
 
   static final TwitterLogin twitterLogin = new TwitterLogin(
     consumerKey: 'n4V8JJp393HIyjYgq8gddXHEZ',
@@ -89,17 +92,17 @@ class _NewLogInState extends State<NewLogIn> {
 
   getUserLocation() async {
     try {
-      gpsEnabled = await geolocator.isLocationServiceEnabled();
+      // gpsEnabled = await geolocator.isLocationServiceEnabled();
 
-      if (!gpsEnabled) {
-        return showDialog<void>(
-          context: context,
-          barrierDismissible: false, // user must tap button!
-          builder: (BuildContext context) {
-            return customLocationDialog();
-          },
-        );
-      }
+      // if (!gpsEnabled) {
+      //   return showDialog<void>(
+      //     context: context,
+      //     barrierDismissible: false, // user must tap button!
+      //     builder: (BuildContext context) {
+      //       return customLocationDialog();
+      //     },
+      //   );
+      // }
 
       currentLocation = await locateUser();
 
@@ -177,6 +180,7 @@ class _NewLogInState extends State<NewLogIn> {
   //bool isLoggedIn = false;
 
   Future<FirebaseUser> _signIn(BuildContext context) async {
+    String fcmToken = await _fcm.getToken();
     try {
       prefs = await SharedPreferences.getInstance();
       this.setState(() {
@@ -185,7 +189,7 @@ class _NewLogInState extends State<NewLogIn> {
       final GoogleSignInAccount googleUser = await _googlSignIn.signIn();
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-      
+
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -201,6 +205,8 @@ class _NewLogInState extends State<NewLogIn> {
             .where('id', isEqualTo: users.uid)
             .getDocuments();
         final List<DocumentSnapshot> documents = result.documents;
+       
+        {
         Firestore.instance.collection('users').document(users.uid).setData({
           'name': users.displayName,
           'email': users.email,
@@ -213,9 +219,23 @@ class _NewLogInState extends State<NewLogIn> {
           'About': null,
           'DogName': null,
           'Zip': null,
-          'isActive':false,
+          'isActive': false,
         });
-        
+
+        if (fcmToken != null) {
+          var tokens = Firestore.instance
+              .collection('users')
+              .document(users.uid)
+              .collection('tokens')
+              .document(fcmToken);
+
+          await tokens.setData({
+            'token': fcmToken,
+            'createdAt': FieldValue.serverTimestamp(), // optional
+            // optional
+          });
+        }
+
         currentUser = users;
         await prefs.setString('id', currentUser.uid);
         await prefs.setString('name', currentUser.displayName);
@@ -223,6 +243,7 @@ class _NewLogInState extends State<NewLogIn> {
 
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        }
       } else {
         Fluttertoast.showToast(msg: "Sign in fail");
         this.setState(() => {isLoading = false});
