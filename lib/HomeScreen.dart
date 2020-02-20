@@ -1,4 +1,5 @@
 import 'package:BuddyToBody/chat.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_map_polyline/google_map_polyline.dart';
 import 'dart:async';
+import './firebaseMessaging.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:permission/permission.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<PolylineId, Polyline> _polylines = <PolylineId, Polyline>{};
   GoogleMapController _controller;
   List<LatLng> routeCoords;
-  
 
   bool isActive = false;
   bool _loading = false;
@@ -46,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   double zoomvalue = 12;
   Position currentLocation;
-   SharedPreferences prefs;
-   String id;
+  SharedPreferences prefs;
+  String id;
 
   Geolocator geolocator = Geolocator();
   // Completer<GoogleMapController> _controller = Completer();
@@ -61,11 +62,18 @@ class _HomeScreenState extends State<HomeScreen> {
     getUserLocation();
     isActive = true;
     readlocal();
-    Firestore.instance.collection('users').document(id).updateData({'isActive':isActive});
+    Firestore.instance
+        .collection('users')
+        .document(id)
+        .updateData({'isActive': isActive});
+
+    FirebasePushNotification().sendAndRetrieveMessage();
+
   }
-  readlocal() async{
-     prefs = await SharedPreferences.getInstance();
-      id = prefs.getString('id');
+
+  readlocal() async {
+    prefs = await SharedPreferences.getInstance();
+    id = prefs.getString('id');
   }
 
   // _addPolyline(List<LatLng> _coordinates) {
@@ -208,7 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: BitmapDescriptor.fromAsset(
                         "assets/images/index_Recovered.png"),
                     onTap: () {
-                    
                       profileDialogInfo(
                           snapshot.data.documents[i]["name"],
                           snapshot.data.documents[i]["photoUrl"],
@@ -226,13 +233,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> profileDialogInfo(
-      String name, String photoUrl, String about,String id,String photourl) async {
+  Future<void> profileDialogInfo(String name, String photoUrl, String about,
+      String id, String photourl) async {
     return showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return customDialog(name, photoUrl, about,id,photourl);
+          return customDialog(name, photoUrl, about, id, photourl);
         });
   }
 }
@@ -244,7 +251,8 @@ class customDialog extends StatefulWidget {
   static String iD;
   static String photoUrl;
 
-  customDialog(String name, String photoUrl, String about,String id,String photourl) {
+  customDialog(
+      String name, String photoUrl, String about, String id, String photourl) {
     userName = name;
     userphotoUrl = photoUrl;
     About = about;
@@ -394,30 +402,32 @@ class _customDialogState extends State<customDialog> {
             SizedBox(
               height: 10,
             ),
-           (true)?InkWell(
-             onTap: (){
-               Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                     Chat(
-                  peerId: customDialog.iD,
-                  peerAvatar: customDialog.photoUrl,
-                  name: customDialog.userName,
-                ),),
-                              (Route<dynamic> route) => false);
-             },
-             child: Container(
-               height: 60,
-               width: 60,
-               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                 shape:BoxShape.rectangle,
-                 borderRadius: BorderRadius.circular(40.0)
-               ),
-               child: Center(child: Text("Chat",style: TextStyle(fontSize: 20,color: Colors.white),)),
-             ),
-           ):Container(),
+            (true)
+                ? Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(30.0),
+                    color: Color(0xffaf5dcc).withOpacity(0.6),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      height: 50.0,
+                      child: MaterialButton(
+                        //disabledColor:(isCheck)?Colors.white: Color(0xffaf5dcc),
+
+                        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Chat(
+                                      peerId: customDialog.iD,
+                                      peerAvatar: customDialog.photoUrl,
+                                      name: customDialog.userName,
+                                    ))),
+                        child: Text("CHAT",
+                            style:
+                                TextStyle(fontSize: 20, color: Colors.white)),
+                      ),
+                    ))
+                : Container(),
           ],
         ),
       ),

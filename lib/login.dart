@@ -220,6 +220,7 @@ class _NewLogInState extends State<NewLogIn> {
           'DogName': null,
           'Zip': null,
           'isActive': false,
+          'pushToken':fcmToken,
         });
 
         if (fcmToken != null) {

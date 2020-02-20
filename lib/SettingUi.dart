@@ -424,6 +424,7 @@ class _PdfViewPageState extends State<PdfViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xff905c96),
         title: Text("Privacy And Policy"),
       ),
       body: Stack(

@@ -40,8 +40,6 @@ class _StepCountingState extends State<StepCounting> {
     super.initState();
     getUserLocation();
 
-    _stepCountValue = '0';
-
     initPlatformState();
   }
 
@@ -55,12 +53,12 @@ class _StepCountingState extends State<StepCounting> {
         onError: _onError, onDone: _onDone, cancelOnError: true);
   }
 
-  void stopListening() {
-    _subscription.cancel();
+  void _onData(int stepCountValue) async {
+    setState(() => this._stepCountValue = "$stepCountValue");
   }
 
-  void _onData(int stepCountValue) async {
-    setState(() => _stepCountValue = "$stepCountValue");
+  void stopListening() {
+    _subscription.cancel();
   }
 
   void _onDone() => print("Finished pedometer tracking");
@@ -248,7 +246,6 @@ class _StepCountingState extends State<StepCounting> {
           mapType: MapType.normal,
           scrollGesturesEnabled: true,
           rotateGesturesEnabled: true,
-          
           trafficEnabled: false,
           initialCameraPosition:
               CameraPosition(target: LatLng(lattitude, langitude), zoom: 20.0),

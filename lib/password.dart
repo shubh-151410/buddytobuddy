@@ -86,18 +86,17 @@ class _PasswordUiState extends State<PasswordUi> {
     var divheight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff334d83),
-        elevation: 0.0,
-        leading: GestureDetector(
-          onTap: (){
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back_ios),
-        )
-      ),
+          backgroundColor: Color(0xff905c96),
+          elevation: 5.0,
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back_ios),
+          )),
       body: Container(
         height: divheight,
-        color: Color(0xff334d83),
+        color: Color(0xff905c96),
         child: Padding(
             padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
             child: Form(
@@ -117,6 +116,12 @@ class _PasswordUiState extends State<PasswordUi> {
                     textAlign: TextAlign.start,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
                       contentPadding: EdgeInsets.all(10.0),
                       labelText: "E-mail",
                       labelStyle: TextStyle(color: Colors.white),
@@ -138,6 +143,10 @@ class _PasswordUiState extends State<PasswordUi> {
                     autofocus: false,
                     textAlign: TextAlign.start,
                     decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
+                      border: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
                       contentPadding: EdgeInsets.all(10.0),
                       labelText: "Password",
                       labelStyle: TextStyle(color: Colors.white),
@@ -159,6 +168,10 @@ class _PasswordUiState extends State<PasswordUi> {
                     autofocus: false,
                     textAlign: TextAlign.start,
                     decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
+                      border: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)),
                       contentPadding: EdgeInsets.all(10.0),
                       labelText: "ConfirmPassword",
                       labelStyle: TextStyle(color: Colors.white),
@@ -175,7 +188,7 @@ class _PasswordUiState extends State<PasswordUi> {
                   Material(
                       elevation: 5.0,
                       borderRadius: BorderRadius.circular(30.0),
-                      color: Color(0xff274986),
+                      color: Color(0xffaf5dcc),
                       child: Container(
                         width: MediaQuery.of(context).size.width,
                         height: 50.0,

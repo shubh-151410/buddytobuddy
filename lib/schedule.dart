@@ -99,41 +99,44 @@ class _ScheduleBuddyState extends State<ScheduleBuddy> {
                 ),
               ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Material(
-                  child: snapshot.data.documents[position]['photoUrl'] != null
-                      ? CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 1.0,
+            child: Padding(
+              padding:  EdgeInsets.only(bottom: 3.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Material(
+                    child: snapshot.data.documents[position]['photoUrl'] != null
+                        ? CachedNetworkImage(
+                            placeholder: (context, url) => Container(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.0,
+                              ),
+                              width: 50.0,
+                              height: 50.0,
+                              padding: EdgeInsets.all(15.0),
                             ),
+                            imageUrl: snapshot.data.documents[position]
+                                ['photoUrl'],
                             width: 50.0,
                             height: 50.0,
-                            padding: EdgeInsets.all(15.0),
-                          ),
-                          imageUrl: snapshot.data.documents[position]
-                              ['photoUrl'],
-                          width: 50.0,
-                          height: 50.0,
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(Icons.account_circle,
-                          size: 50.0, color: Colors.grey),
-                  borderRadius: BorderRadius.all(Radius.circular(25.0),),
-                  clipBehavior: Clip.hardEdge,
-                ),
-                SizedBox(
-                  width: 10.0,
-                ),
-                Flexible(
-                  child: Text(
-                    snapshot.data.documents[position]["name"],
-                    style: TextStyle(fontSize: 14, color: Colors.black),
+                            fit: BoxFit.cover,
+                          )
+                        : Icon(Icons.account_circle,
+                            size: 50.0, color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(25.0),),
+                    clipBehavior: Clip.hardEdge,
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Flexible(
+                    child: Text(
+                      snapshot.data.documents[position]["name"],
+                      style: TextStyle(fontSize: 14, color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

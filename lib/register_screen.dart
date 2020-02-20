@@ -154,7 +154,8 @@ class _HomeScreenState extends State<HomeScreen>
         "photoUrl": Url,
         'chattingWith': null,
         'id': null,
-        'isActive':false
+        'isActive':false,
+        'pushToken':fcmToken,
         
       };
 

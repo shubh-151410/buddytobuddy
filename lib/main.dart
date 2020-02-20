@@ -7,6 +7,7 @@ import './mapScreen.dart';
 import 'dart:async';
 
 void main() {
+  // BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   runApp(new MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
@@ -19,6 +20,10 @@ void main() {
       '/HomeScreen': (BuildContext context) => new LogIn()
     },
   ));
+}
+void backgroundFetchHeadlessTask() async {
+  print('[BackgroundFetch] Headless event received.');
+  //BackgroundFetch.finish();
 }
 
 class SplashScreen extends StatefulWidget {
