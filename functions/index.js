@@ -50,16 +50,16 @@ exports.sendNotification = functions.firestore
                     })
                     .catch(error => {
                       console.log('Error sending message:', error)
-                    })
-                })
-              })
+                    },)
+                },)
+              },)
           } else {
               return null
             console.log('Can not find pushToken target user')
           }
-        })
-      }).catch(error =>{
+        },)
+      },).catch(error =>{
         return null
-      })
+      },)
     
-  })
+  },)

@@ -18,9 +18,9 @@ class _BuddynowState extends State<Buddynow> {
   Geolocator geolocator = Geolocator();
   double lattitude;
   double langitude;
-   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    final FirebaseMessaging _fcm = FirebaseMessaging();
-    
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -46,8 +46,6 @@ class _BuddynowState extends State<Buddynow> {
     } on Exception {
       currentLocation = null;
     }
-
-
   }
 
   @override
@@ -175,7 +173,6 @@ class _BuddynowState extends State<Buddynow> {
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
-                          
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.2),
                                 shape: BoxShape.rectangle,
