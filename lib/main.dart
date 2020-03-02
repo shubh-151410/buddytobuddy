@@ -1,3 +1,4 @@
+import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import './login.dart';
 
@@ -8,22 +9,24 @@ import 'dart:async';
 
 void main() {
   // BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-  runApp(new MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      bottomAppBarColor:  Color(0xff905c96),
-    
+  runApp(
+    new MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        bottomAppBarColor: Color(0xff905c96),
+      ),
+      home: new SplashScreen(),
+      routes: <String, WidgetBuilder>{
+        '/HomeScreen': (BuildContext context) => new LogIn()
+      },
     ),
-    
-    home: new SplashScreen(),
-    routes: <String, WidgetBuilder>{
-      '/HomeScreen': (BuildContext context) => new LogIn()
-    },
-  ));
+  );
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
-void backgroundFetchHeadlessTask() async {
+
+void backgroundFetchHeadlessTask(String taskId) async {
   print('[BackgroundFetch] Headless event received.');
-  //BackgroundFetch.finish();
+  BackgroundFetch.finish(taskId);
 }
 
 class SplashScreen extends StatefulWidget {
@@ -61,4 +64,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

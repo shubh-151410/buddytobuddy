@@ -54,7 +54,7 @@ dependencies:
   google_map_polyline: ^0.2.0+1
   flutter_polyline_points: ^0.1.0
   firebase_messaging: ^6.0.9
-
+  background_fetch: ^0.5.4
   pdftron_flutter:
     git:
       url: git://github.com/PDFTron/pdftron-flutter.git

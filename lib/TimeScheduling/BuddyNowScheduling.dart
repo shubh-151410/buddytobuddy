@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,6 +9,7 @@ import '../MainMap/StepCounting.dart';
 import 'package:latlong/latlong.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 
 class Buddynow extends StatefulWidget {
   @override
@@ -20,6 +24,9 @@ class _BuddynowState extends State<Buddynow> {
   double langitude;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final FirebaseMessaging _fcm = FirebaseMessaging();
+  final String serverToken =
+      'APA91bHjnkjcufsyW7X1ueiSHY68rBAd7Fg7NvCkgEvfARI0lhw3pGZ0PQZ9g_9LAd5o4yt3zQMlblMzIfdwtk0JSOTQEXUtnscfQ432qhQ_BX9DgNWgllDnsZl0pR7Nn';
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 
   @override
   void initState() {
@@ -82,19 +89,19 @@ class _BuddynowState extends State<Buddynow> {
           child: InkWell(
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StepCounting(
-                      lattitude: double.tryParse(
-                          snapshot.data.documents[position]["lattitude"]),
-                      longitude: double.tryParse(
-                          snapshot.data.documents[position]["longitude"]),
-                    ),
-                  ));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StepCounting(
+                    lattitude: double.tryParse(
+                        snapshot.data.documents[position]["lattitude"]),
+                    longitude: double.tryParse(
+                        snapshot.data.documents[position]["longitude"]),
+                  ),
+                ),
+              );
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Material(
                   child: snapshot.data.documents[position]['photoUrl'] != null
@@ -145,7 +152,9 @@ class _BuddynowState extends State<Buddynow> {
                 Align(
                   alignment: Alignment.bottomRight,
                   child: MaterialButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await sendAndRetrieveMessage(
+                          snapshot.data.documents[position]["pushToken"]);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -215,5 +224,49 @@ class _BuddynowState extends State<Buddynow> {
         );
       },
     );
+  }
+
+  Future<Map<String, dynamic>> sendAndRetrieveMessage(
+      String userpushtoken) async {
+    await firebaseMessaging.requestNotificationPermissions(
+      const IosNotificationSettings(
+          sound: true, badge: true, alert: true, provisional: false),
+    );
+
+    var a = await http.post(
+      'https://fcm.googleapis.com/fcm/send',
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization':
+            'key=AAAA7rAJNeA:APA91bE88G3Thx1CsYkIAA04Y6wmfuHoFkjOY2ScigP_sZEPaC6967ppdd2Hh8TsbZVrOlk4dcd8I2lD1-bTtB7yVxoETy_VNbLmtIKIdvkGSbXOa4ObqAFSaOa67BKuTBGaZ6XIehrB',
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'notification': <String, dynamic>{
+            'body': 'Dog walking request',
+            'title': 'BuddyToBuddy'
+          },
+          'priority': 'high',
+          "data": {"title": "new messages", "score": "5x1", "time": "15:10"},
+          "to": userpushtoken
+        },
+      ),
+    );
+
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!");
+    print(a.body);
+    print(a.statusCode);
+    print(a.headers);
+
+    final Completer<Map<String, dynamic>> completer =
+        Completer<Map<String, dynamic>>();
+
+    firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        completer.complete(message);
+      },
+    );
+
+    return completer.future;
   }
 }

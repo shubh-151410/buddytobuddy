@@ -12,6 +12,9 @@ class _PasswordUiState extends State<PasswordUi> {
   GlobalKey<FormState> _key = GlobalKey();
   bool _validate = false;
   DocumentSnapshot _currentDocument;
+  double height = 0;
+  double width = 0;
+  double document = 0;
 
   String password, confirmpassword, email;
   final passwordcontroller = TextEditingController();
@@ -73,6 +76,7 @@ class _PasswordUiState extends State<PasswordUi> {
               .document(querySnapshot.documents[i].documentID)
               .updateData(
                   {'password': password, 'confirmPassword': confirmpassword});
+                  Navigator.pop(context);
           Fluttertoast.showToast(msg: "Password Is Updated");
         } else {
           //Fluttertoast.showToast(msg: "Email id is not registered");
@@ -84,6 +88,8 @@ class _PasswordUiState extends State<PasswordUi> {
   @override
   Widget build(BuildContext context) {
     var divheight = MediaQuery.of(context).size.height;
+    height = divheight;
+    width = MediaQuery.of(context).size.width; 
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Color(0xff905c96),
@@ -183,22 +189,26 @@ class _PasswordUiState extends State<PasswordUi> {
                     },
                   ),
                   SizedBox(
-                    height: 10.0,
+                    height: height*0.05,
                   ),
-                  Material(
-                      elevation: 5.0,
-                      borderRadius: BorderRadius.circular(30.0),
-                      color: Color(0xffaf5dcc),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 50.0,
-                        child: MaterialButton(
-                          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                          onPressed: changePassword,
-                          child: Text("Change Password",
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      )),
+                  Container(
+                    margin: EdgeInsets.only(left:width*0.05,right:width*0.05),
+                    child: Material(
+                        elevation: 5.0,
+                        borderRadius: BorderRadius.circular(30.0),
+                        color: Color(0xffaf5dcc),
+                        child: Container(
+                      
+                          width: MediaQuery.of(context).size.width,
+                          height: height*0.06,
+                          child: MaterialButton(
+                            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                            onPressed: changePassword,
+                            child: Text("Change Password".toUpperCase(),
+                                style: TextStyle(color: Colors.white,fontSize: 18)),
+                          ),
+                        )),
+                  ),
                 ],
               ),
             )),

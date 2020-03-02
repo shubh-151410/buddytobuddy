@@ -32,10 +32,9 @@ class _HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin, ImagePickerListener {
   GlobalKey<FormState> _key = new GlobalKey();
   bool _validate = false;
-   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final FirebaseMessaging _fcm = FirebaseMessaging();
-
-
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   File _image;
   AnimationController _controller;
   ImagePickerHandler imagePicker;
@@ -134,12 +133,30 @@ class _HomeScreenState extends State<HomeScreen>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final FirebaseAuth _auth = FirebaseAuth.instance;
       final Firestore _firestore = Firestore.instance;
-       String fcmToken = await _fcm.getToken();
+      String fcmToken = await _fcm.getToken();
       StorageReference firebaseStorageRef =
           FirebaseStorage.instance.ref().child("UserPhoto");
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
-      final String Url = await taskSnapshot.ref.getDownloadURL();
+      String Url = await taskSnapshot.ref.getDownloadURL();
+
+      QuerySnapshot querySnapshot = await Firestore.instance
+          .collection("users")
+          .where("name")
+          .getDocuments();
+      var list = querySnapshot.documents;
+      for (int i = 0; i < querySnapshot.documents.length; i++) {
+        if (email == list[i]["email"]) {
+          this.setState(() {
+            isLoading = false;
+          });
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+              content: Text("Email Id is alreay present use different account"),
+              backgroundColor: Colors.red));
+          print("Email is already present please use different account");
+          return;
+        }
+      }
       FirebaseUser user = await _auth.currentUser();
       Map<String, dynamic> data = <String, dynamic>{
         "name": name,
@@ -151,14 +168,13 @@ class _HomeScreenState extends State<HomeScreen>
         "DogName": dogname,
         "lattitude": lattitude.toString(),
         "longitude": langitude.toString(),
-        "photoUrl": Url,
+        "photoUrl": Url+name,
         'chattingWith': null,
         'id': null,
-        'isActive':false,
-        'pushToken':fcmToken,
-        
+        'isActive': false,
+        'pushToken': fcmToken,
       };
-
+      print(fcmToken);
       var userId = await Firestore.instance.collection('users').add(data);
       await prefs.setString('id', userId.documentID);
       await Firestore.instance
@@ -166,19 +182,19 @@ class _HomeScreenState extends State<HomeScreen>
           .document(userId.documentID)
           .updateData({'id': '${userId.documentID}'});
 
-           if (fcmToken != null) {
-          var tokens = Firestore.instance
-              .collection('users')
-              .document(userId.documentID)
-              .collection('tokens')
-              .document(fcmToken);
+      if (fcmToken != null) {
+        var tokens = Firestore.instance
+            .collection('users')
+            .document(userId.documentID)
+            .collection('tokens')
+            .document(fcmToken);
 
-          await tokens.setData({
-            'token': fcmToken,
-            'createdAt': FieldValue.serverTimestamp(), // optional
-            // optional
-          });
-        }
+        await tokens.setData({
+          'token': fcmToken,
+          'createdAt': FieldValue.serverTimestamp(), // optional
+          // optional
+        });
+      }
 
       Navigator.push(
         context,
@@ -201,92 +217,93 @@ class _HomeScreenState extends State<HomeScreen>
     var divheight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Register"),
-          centerTitle: true,
-          backgroundColor: Color(0xff905c96),
-          elevation: 0.0,
-        ),
-        body: Stack(
-          children: <Widget>[
-            Container(
-              height: divheight,
-              width: MediaQuery.of(context).size.width,
-              color: Color(0xff905c96),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      InkWell(
-                        onTap: () => imagePicker.showDialog(context),
-                        child: new Center(
-                          child: _image == null
-                              ? new Stack(
-                                  children: <Widget>[
-                                    new Center(
-                                      child: new CircleAvatar(
-                                        radius: 60.0,
-                                        backgroundColor:
-                                            const Color(0xFF778899),
-                                      ),
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text("Register"),
+        centerTitle: true,
+        backgroundColor: Color(0xff905c96),
+        elevation: 0.0,
+      ),
+      body: Stack(
+        children: <Widget>[
+          Container(
+            height: divheight,
+            width: MediaQuery.of(context).size.width,
+            color: Color(0xff905c96),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    InkWell(
+                      onTap: () => imagePicker.showDialog(context),
+                      child: new Center(
+                        child: _image == null
+                            ? new Stack(
+                                children: <Widget>[
+                                  new Center(
+                                    child: new CircleAvatar(
+                                      radius: 60.0,
+                                      backgroundColor: const Color(0xFF778899),
                                     ),
-                                    new Center(
-                                      child: Container(
-                                        margin: EdgeInsets.only(top: 30),
-                                        child: new Image.asset(
-                                          "assets/images/photo_camera.png",
-                                          height: 60,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : new Container(
-                                  height: 160.0,
-                                  width: 160.0,
-                                  decoration: new BoxDecoration(
-                                    color: const Color(0xff7c94b6),
-                                    image: new DecorationImage(
-                                      image: new ExactAssetImage(_image.path),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    border: Border.all(width: 5.0),
-                                    borderRadius: new BorderRadius.all(
-                                        const Radius.circular(100.0)),
                                   ),
+                                  new Center(
+                                    child: Container(
+                                      margin: EdgeInsets.only(top: 30),
+                                      child: new Image.asset(
+                                        "assets/images/photo_camera.png",
+                                        height: 60,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : new Container(
+                                height: 160.0,
+                                width: 160.0,
+                                decoration: new BoxDecoration(
+                                  color: const Color(0xff7c94b6),
+                                  image: new DecorationImage(
+                                    image: new ExactAssetImage(_image.path),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  border: Border.all(width: 5.0),
+                                  borderRadius: new BorderRadius.all(
+                                      const Radius.circular(100.0)),
                                 ),
-                        ),
+                              ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Form(
-                        key: _key,
-                        autovalidate: _validate,
-                        child: FormUI(context),
-                      ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Form(
+                      key: _key,
+                      autovalidate: _validate,
+                      child: FormUI(context),
+                    ),
+                  ],
                 ),
               ),
             ),
-            Positioned(
-              child: isLoading
-                  ? Container(
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
-                        ),
+          ),
+          Positioned(
+            child: isLoading
+                ? Container(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
                       ),
-                      color: Colors.white.withOpacity(0.8),
-                    )
-                  : Container(),
-            ),
-          ],
-        ));
+                    ),
+                    color: Colors.white.withOpacity(0.8),
+                  )
+                : Container(),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget FormUI(BuildContext context) {
@@ -305,7 +322,10 @@ class _HomeScreenState extends State<HomeScreen>
           decoration: InputDecoration(
             fillColor: Color(0xffaf5dcc),
             filled: true,
-            prefixIcon: Icon(Icons.person,color: Colors.white,),
+            prefixIcon: Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
             suffixIcon: Icon(
               Icons.edit,
               color: Colors.white,
@@ -350,7 +370,10 @@ class _HomeScreenState extends State<HomeScreen>
           decoration: InputDecoration(
             fillColor: Color(0xffaf5dcc),
             filled: true,
-            prefixIcon: Icon(Icons.email,color: Colors.white,),
+            prefixIcon: Icon(
+              Icons.email,
+              color: Colors.white,
+            ),
             suffixIcon: Icon(
               Icons.edit,
               color: Colors.white,
@@ -395,7 +418,10 @@ class _HomeScreenState extends State<HomeScreen>
           decoration: InputDecoration(
             fillColor: Color(0xffaf5dcc),
             filled: true,
-            prefixIcon: Icon(Icons.vpn_key,color: Colors.white,),
+            prefixIcon: Icon(
+              Icons.vpn_key,
+              color: Colors.white,
+            ),
             suffixIcon: Icon(
               Icons.edit,
               color: Colors.white,
@@ -440,7 +466,10 @@ class _HomeScreenState extends State<HomeScreen>
           decoration: InputDecoration(
             fillColor: Color(0xffaf5dcc),
             filled: true,
-            prefixIcon: Icon(Icons.vpn_key,color: Colors.white,),
+            prefixIcon: Icon(
+              Icons.vpn_key,
+              color: Colors.white,
+            ),
             suffixIcon: Icon(
               Icons.edit,
               color: Colors.white,
@@ -484,7 +513,10 @@ class _HomeScreenState extends State<HomeScreen>
           decoration: InputDecoration(
             fillColor: Color(0xffaf5dcc),
             filled: true,
-            prefixIcon: Icon(Icons.pets,color: Colors.white,),
+            prefixIcon: Icon(
+              Icons.pets,
+              color: Colors.white,
+            ),
             suffixIcon: Icon(
               Icons.edit,
               color: Colors.white,
@@ -528,7 +560,10 @@ class _HomeScreenState extends State<HomeScreen>
           decoration: InputDecoration(
             fillColor: Color(0xffaf5dcc),
             filled: true,
-            prefixIcon: Icon(Icons.assignment_ind,color: Colors.white,),
+            prefixIcon: Icon(
+              Icons.assignment_ind,
+              color: Colors.white,
+            ),
             suffixIcon: Icon(
               Icons.edit,
               color: Colors.white,
@@ -576,7 +611,10 @@ class _HomeScreenState extends State<HomeScreen>
           decoration: InputDecoration(
             fillColor: Color(0xffaf5dcc),
             filled: true,
-            prefixIcon: Icon(Icons.fiber_pin,color: Colors.white,),
+            prefixIcon: Icon(
+              Icons.fiber_pin,
+              color: Colors.white,
+            ),
             suffixIcon: Icon(
               Icons.edit,
               color: Colors.white,

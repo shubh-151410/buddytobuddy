@@ -367,24 +367,7 @@ class _NewLogInState extends State<NewLogIn> {
         password = value;
       },
     );
-    // final signup_button = Material(
-    //     elevation: 5.0,
-    //     borderRadius: BorderRadius.circular(30.0),
-    //     color: Color(0xff274986),
-    //     child: Container(
-    //       width: 120.0,
-    //       height: 50.0,
-    //       child: MaterialButton(
-    //         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-    //         onPressed: () {
-    //           Navigator.push(
-    //             context,
-    //             MaterialPageRoute(builder: (context) => HomeScreen()),
-    //           );
-    //         },
-    //         child: Text("SIGN UP", style: TextStyle(color: Colors.white)),
-    //       ),
-    //     ));
+   
     final signin_button = Material(
         elevation: 5.0,
         borderRadius: BorderRadius.circular(30.0),

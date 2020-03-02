@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -33,14 +36,52 @@ class _StepCountingState extends State<StepCounting> {
   Set<Polyline> get polyLines => _polyLines;
   LatLng _center;
   Position currentLocation;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   Geolocator geolocator = Geolocator();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getUserLocation();
-
+   // startMain();
     initPlatformState();
+  }
+
+  startMain() async {
+    await firebaseCloudMessaging_Listeners();
+  }
+
+  firebaseCloudMessaging_Listeners() async {
+    await _firebaseMessaging.requestNotificationPermissions();
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print('on message $message');
+        // await _showNotificationWithoutSound();
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print('on resume $message');
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print('on launch $message');
+      },
+    );
+
+    _firebaseMessaging.autoInitEnabled();
+  }
+
+  Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
+    if (message.containsKey('data')) {
+      // Handle data message
+      final dynamic data = message['data'];
+      print(data);
+    }
+
+    if (message.containsKey('notification')) {
+      // Handle notification message
+      final dynamic notification = message['notification'];
+    }
+
+    // Or do other work.
   }
 
   Future<void> initPlatformState() async {
@@ -276,5 +317,22 @@ class _StepCountingState extends State<StepCounting> {
     // TODO: impl ement dispose
     super.dispose();
     _subscription.cancel();
+  }
+}
+
+class Fcm {
+  static Future<dynamic> myBackgroundMessageHandler(
+      Map<String, dynamic> message) {
+    if (message.containsKey('data')) {
+      // Handle data message
+      final dynamic data = message['data'];
+    }
+
+    if (message.containsKey('notification')) {
+      // Handle notification message
+      final dynamic notification = message['notification'];
+    }
+
+    // Or do other work.
   }
 }

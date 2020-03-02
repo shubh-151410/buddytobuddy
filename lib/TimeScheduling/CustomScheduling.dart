@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:background_fetch/background_fetch.dart';
 
 DateTime selectedDate = DateTime.now();
 String time, date;
@@ -20,87 +21,90 @@ class _CustomSchedulingState extends State<CustomScheduling> {
   @override
   void initState() {
     super.initState();
-    //initPlatformState();
+     initPlatformState();
+  }
+   Future<void> initPlatformState() async {
+    // Configure BackgroundFetch.
+    BackgroundFetch.configure(BackgroundFetchConfig(
+        minimumFetchInterval: 15,
+        stopOnTerminate: false,
+        
+        enableHeadless: false,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresStorageNotLow: false,
+        requiresDeviceIdle: false,
+        requiredNetworkType: NetworkType.NONE
+    ), (String taskId) async {
+      // This is the fetch-event callback.
+      print("[BackgroundFetch] Event received $taskId");
+      setState(() {
+        _events.insert(0, new DateTime.now());
+      });
+      // IMPORTANT:  You must signal completion of your task or the OS can punish your app
+      // for taking too long in the background.
+      BackgroundFetch.finish(taskId);
+    }).then((int status) {
+      print('[BackgroundFetch] configure success: $status');
+      setState(() {
+        _status = status;
+      });
+    }).catchError((e) {
+      print('[BackgroundFetch] configure ERROR: $e');
+      setState(() {
+        _status = e;
+      });
+    });
+
+    // Optionally query the current BackgroundFetch status.
+    int status = await BackgroundFetch.status;
+    setState(() {
+      _status = status;
+    });
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
   }
 
-  // Future<void> initPlatformState() async {
-  //   // Configure BackgroundFetch.
-  //   BackgroundFetch.configure(
-  //       BackgroundFetchConfig(
-  //           minimumFetchInterval: 15,
-  //           stopOnTerminate: false,
-  //           enableHeadless: false,
-  //           requiresBatteryNotLow: false,
-  //           requiresCharging: false,
-  //           requiresStorageNotLow: false,
-  //           requiresDeviceIdle: false,
-  //           requiredNetworkType: BackgroundFetchConfig.NETWORK_TYPE_NONE),
-  //       () async {
-  //     // This is the fetch-event callback.
-  //     print('[BackgroundFetch] Event received');
-  //     setState(() {
-  //       _events.insert(0, new DateTime.now());
-  //     });
-  //     // IMPORTANT:  You must signal completion of your fetch task or the OS can punish your app
-  //     // for taking too long in the background.
-  //     BackgroundFetch.finish();
-  //   }).then((int status) {
-  //     print('[BackgroundFetch] configure success: $status');
-  //     setState(() {
-  //       _status = status;
-  //     });
-  //   }).catchError((e) {
-  //     print('[BackgroundFetch] configure ERROR: $e');
-  //     setState(() {
-  //       _status = e;
-  //     });
-  //   });
+  void _onClickEnable(enabled) {
+    setState(() {
+      _enabled = enabled;
+    });
+    if (enabled) {
+      BackgroundFetch.start().then((int status) {
+        print('[BackgroundFetch] start success: $status');
+      }).catchError((e) {
+        print('[BackgroundFetch] start FAILURE: $e');
+      });
+    } else {
+      BackgroundFetch.stop().then((int status) {
+        print('[BackgroundFetch] stop success: $status');
+      });
+    }
+  }
 
-  //   // Optionally query the current BackgroundFetch status.
-  //   int status = await BackgroundFetch.status;
-  //   setState(() {
-  //     _status = status;
-  //   });
-
-  //   // If the widget was removed from the tree while the asynchronous platform
-  //   // message was in flight, we want to discard the reply rather than calling
-  //   // setState to update our non-existent appearance.
-  //   if (!mounted) return;
-  // }
-
-  // void _onClickEnable(enabled) {
-  //   setState(() {
-  //     _enabled = enabled;
-  //   });
-  //   if (enabled) {
-  //     BackgroundFetch.start().then((int status) {
-  //       print('[BackgroundFetch] start success: $status');
-  //     }).catchError((e) {
-  //       print('[BackgroundFetch] start FAILURE: $e');
-  //     });
-  //   } else {
-  //     BackgroundFetch.stop().then((int status) {
-  //       print('[BackgroundFetch] stop success: $status');
-  //     });
-  //   }
-  // }
-
-  // void _onClickStatus() async {
-  //   int status = await BackgroundFetch.status;
-  //   print('[BackgroundFetch] status: $status');
-  //   setState(() {
-  //     _status = status;
-  //   });
-  // }
+  void _onClickStatus() async {
+    int status = await BackgroundFetch.status;
+    print('[BackgroundFetch] status: $status');
+    setState(() {
+      _status = status;
+    });
+  }
 
   Future<Null> selectTime(BuildContext context) async {
     final TimeOfDay picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: 10, minute: 47),
       builder: (BuildContext context, Widget child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
-          child: child,
+        return Theme(
+          data: ThemeData.light().copyWith(
+              primaryColor: Color(0xff905c96), accentColor: Color(0xff905c96)),
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+            child: child,
+          ),
         );
       },
     );
@@ -116,7 +120,16 @@ class _CustomSchedulingState extends State<CustomScheduling> {
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
+        lastDate: DateTime(2101),
+        builder: (BuildContext context, Widget child) {
+          return Theme(
+              data: ThemeData.light().copyWith(
+                
+                  primaryColor: Color(0xff905c96),
+                  accentColor: Color(0xff905c96)),
+              child: child);
+        });
+
     if (picked != null && picked != selectedDate) {
       addFriendDialog();
       setState(() {
@@ -151,15 +164,22 @@ class _CustomSchedulingState extends State<CustomScheduling> {
                 SizedBox(
                   width: 50.0,
                 ),
-                FloatingActionButton(
-                  backgroundColor: Color(0xff905c96).withOpacity(0.6),
-                  onPressed: () => selectTime(context),
-                  child: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 35.0,
-                  ),
-                )
+                Theme(
+                    data: Theme.of(context).copyWith(
+                      primaryColor: Color(0xff905c96),
+                    ),
+                    child: Builder(builder: (context) {
+                      return FloatingActionButton(
+                        mini: true,
+                        backgroundColor: Color(0xff905c96).withOpacity(0.6),
+                        onPressed: () => selectTime(context),
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 30.0,
+                        ),
+                      );
+                    }))
               ],
             ),
             width: MediaQuery.of(context).size.width,
@@ -336,6 +356,7 @@ class _SelectBuddyState extends State<SelectBuddy> {
           child: Padding(
             padding: EdgeInsets.only(bottom: 2.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Material(
                   child: snapshot.data.documents[count]['photoUrl'] != null
@@ -368,25 +389,28 @@ class _SelectBuddyState extends State<SelectBuddy> {
                 SizedBox(
                   width: 5.0,
                 ),
-                InkWell(
-                  onTap: () {
-                    friendsName.add(snapshot.data.documents[count]['name']);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(2.0),
-                    child: Center(
-                      child: Text(
-                        "Add",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                Align(
+                  alignment: Alignment.centerRight,
+                                  child: InkWell(
+                    onTap: () {
+                      friendsName.add(snapshot.data.documents[count]['name']);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(2.0),
+                      child: Center(
+                        child: Text(
+                          "Add",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-                    width: 70.0,
-                    decoration: BoxDecoration(
-                      color: Color(0xffaf5dcc),
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(20),
+                      width: 70.0,
+                      decoration: BoxDecoration(
+                        color: Color(0xffaf5dcc),
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
                       ),
                     ),
                   ),

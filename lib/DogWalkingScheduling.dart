@@ -113,16 +113,13 @@ class _DogWalkingSchedulingState extends State<DogWalkingScheduling> {
                 SizedBox(
                   width: 100,
                 ),
-                
                 Align(
                   alignment: Alignment.bottomRight,
                   child: MaterialButton(
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) =>StepCounting()
-                        ),
+                        MaterialPageRoute(builder: (context) => StepCounting()),
                       );
                     },
                     child: Align(
