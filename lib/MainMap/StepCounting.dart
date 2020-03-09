@@ -6,13 +6,16 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:pedometer/pedometer.dart';
-import 'package:toast/toast.dart';
+//import 'package:toast/toast.dart';
 import './map_request.dart';
+import 'package:fluttertoast/fluttertoast.dart' ;
+
 
 class StepCounting extends StatefulWidget {
   final double lattitude;
   final double longitude;
-  StepCounting({@required this.lattitude, @required this.longitude});
+  final String userName;
+  StepCounting({@required this.lattitude, @required this.longitude,this.userName});
   @override
   _StepCountingState createState() => _StepCountingState(
       destinationlattitude: lattitude, destinationlongitude: longitude);
@@ -45,6 +48,7 @@ class _StepCountingState extends State<StepCounting> {
     getUserLocation();
    // startMain();
     initPlatformState();
+    Fluttertoast.showToast(msg: "Request have been sent to ${widget.userName}",toastLength:Toast.LENGTH_LONG);
   }
 
   startMain() async {
@@ -209,8 +213,8 @@ class _StepCountingState extends State<StepCounting> {
               child: InkWell(
                 onTap: () {
                   stopListening();
-                  Toast.show("Buddy Stop", context,
-                      duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+                  // Toast.show("Buddy Stop", context,
+                  //     duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
                 },
                 child: ClipOval(
                   child: Container(

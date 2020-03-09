@@ -37,19 +37,10 @@ class Chat extends StatelessWidget {
               children: <Widget>[
                 Text(
                   name,
-                  style: TextStyle(fontSize: 14, color: Colors.white),
+                  style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
-                SizedBox(width: 3.0,),
-                Container(
-                  height: 10,
-                  width: 10,
-                  child: Text(""),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(40)
-                  ),
-                )
+               
+                
                 
               ],
             ),
@@ -579,6 +570,7 @@ class ChatScreenState extends State<ChatScreen> {
                   hintText: 'Say hi to Your Friend',
                   hintStyle: TextStyle(
                     color: Colors.white,
+                    
                   ),
                 ),
                 focusNode: focusNode,

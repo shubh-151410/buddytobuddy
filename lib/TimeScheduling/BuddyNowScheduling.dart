@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -34,6 +35,10 @@ class _BuddynowState extends State<Buddynow> {
     super.initState();
 
     getUserLocation();
+    final amOnline = FirebaseDatabase.instance.reference().child('users');
+    var _amOnlineSubscription = amOnline.onValue.listen((Event event) {
+      print(event);
+    });
   }
 
   Future<Position> locateUser() {
@@ -96,12 +101,12 @@ class _BuddynowState extends State<Buddynow> {
                         snapshot.data.documents[position]["lattitude"]),
                     longitude: double.tryParse(
                         snapshot.data.documents[position]["longitude"]),
+                    userName: snapshot.data.documents[position]["name"],
                   ),
                 ),
               );
             },
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Material(
                   child: snapshot.data.documents[position]['photoUrl'] != null
@@ -125,11 +130,8 @@ class _BuddynowState extends State<Buddynow> {
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                   clipBehavior: Clip.hardEdge,
                 ),
-                SizedBox(
-                  width: 10.0,
-                ),
-                Flexible(
-                  flex: 4,
+                Expanded(
+                  flex: 2,
                   child: Column(
                     children: <Widget>[
                       Text(
@@ -146,26 +148,17 @@ class _BuddynowState extends State<Buddynow> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  width: 80,
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
+                Expanded(
+                  flex: 3,
                   child: MaterialButton(
                     onPressed: () async {
                       await sendAndRetrieveMessage(
-                          snapshot.data.documents[position]["pushToken"]);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StepCounting(
-                            lattitude: double.tryParse(
-                                snapshot.data.documents[position]["lattitude"]),
-                            longitude: double.tryParse(
-                                snapshot.data.documents[position]["longitude"]),
-                          ),
-                        ),
-                      );
+                          snapshot.data.documents[position]["pushToken"],
+                          double.tryParse(
+                              snapshot.data.documents[position]["lattitude"]),
+                          double.tryParse(
+                              snapshot.data.documents[position]["longitude"]),
+                          snapshot.data.documents[position]["name"]);
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -226,8 +219,8 @@ class _BuddynowState extends State<Buddynow> {
     );
   }
 
-  Future<Map<String, dynamic>> sendAndRetrieveMessage(
-      String userpushtoken) async {
+  Future<Map<String, dynamic>> sendAndRetrieveMessage(String userpushtoken,
+      double lattitude, double longitude, String username) async {
     await firebaseMessaging.requestNotificationPermissions(
       const IosNotificationSettings(
           sound: true, badge: true, alert: true, provisional: false),
@@ -257,6 +250,15 @@ class _BuddynowState extends State<Buddynow> {
     print(a.body);
     print(a.statusCode);
     print(a.headers);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => StepCounting(
+                  lattitude: lattitude,
+                  longitude: longitude,
+                  userName: username,
+                )),
+        (Route<dynamic> abc) => true);
 
     final Completer<Map<String, dynamic>> completer =
         Completer<Map<String, dynamic>>();

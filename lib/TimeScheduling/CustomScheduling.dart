@@ -1,4 +1,6 @@
 //import 'package:background_fetch/background_fetch.dart';
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -18,24 +20,31 @@ class _CustomSchedulingState extends State<CustomScheduling> {
   bool _enabled = true;
   int _status = 0;
   List<DateTime> _events = [];
+  String _id = "";
   @override
   void initState() {
     super.initState();
-     initPlatformState();
+    initPlatformState();
+    getUserId();
   }
-   Future<void> initPlatformState() async {
+
+  Future getUserId() async {
+    var prefs = await SharedPreferences.getInstance();
+    _id = prefs.getString('id');
+  }
+
+  Future<void> initPlatformState() async {
     // Configure BackgroundFetch.
-    BackgroundFetch.configure(BackgroundFetchConfig(
-        minimumFetchInterval: 15,
-        stopOnTerminate: false,
-        
-        enableHeadless: false,
-        requiresBatteryNotLow: false,
-        requiresCharging: false,
-        requiresStorageNotLow: false,
-        requiresDeviceIdle: false,
-        requiredNetworkType: NetworkType.NONE
-    ), (String taskId) async {
+    BackgroundFetch.configure(
+        BackgroundFetchConfig(
+            minimumFetchInterval: 15,
+            stopOnTerminate: false,
+            enableHeadless: false,
+            requiresBatteryNotLow: false,
+            requiresCharging: false,
+            requiresStorageNotLow: false,
+            requiresDeviceIdle: false,
+            requiredNetworkType: NetworkType.NONE), (String taskId) async {
       // This is the fetch-event callback.
       print("[BackgroundFetch] Event received $taskId");
       setState(() {
@@ -62,9 +71,6 @@ class _CustomSchedulingState extends State<CustomScheduling> {
       _status = status;
     });
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
   }
 
@@ -124,7 +130,6 @@ class _CustomSchedulingState extends State<CustomScheduling> {
         builder: (BuildContext context, Widget child) {
           return Theme(
               data: ThemeData.light().copyWith(
-                
                   primaryColor: Color(0xff905c96),
                   accentColor: Color(0xff905c96)),
               child: child);
@@ -165,10 +170,11 @@ class _CustomSchedulingState extends State<CustomScheduling> {
                   width: 50.0,
                 ),
                 Theme(
-                    data: Theme.of(context).copyWith(
-                      primaryColor: Color(0xff905c96),
-                    ),
-                    child: Builder(builder: (context) {
+                  data: Theme.of(context).copyWith(
+                    primaryColor: Color(0xff905c96),
+                  ),
+                  child: Builder(
+                    builder: (context) {
                       return FloatingActionButton(
                         mini: true,
                         backgroundColor: Color(0xff905c96).withOpacity(0.6),
@@ -179,7 +185,38 @@ class _CustomSchedulingState extends State<CustomScheduling> {
                           size: 30.0,
                         ),
                       );
-                    }))
+                    },
+                  ),
+                ),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    primaryColor: Color(0xff905c96),
+                  ),
+                  child: Builder(
+                    builder: (context) {
+                      return FloatingActionButton(
+                        mini: true,
+                        backgroundColor: Color(0xff905c96).withOpacity(0.6),
+                        onPressed: () async {
+                          var prefs = await SharedPreferences.getInstance();
+                          String id = prefs.getString('id');
+                          print(id);
+                          Firestore.instance
+                              .collection("scheduling")
+                              .document(id)
+                              .delete();
+
+                          //  print(a.snapshots().first);
+                        },
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                          size: 25.0,
+                        ),
+                      );
+                    },
+                  ),
+                )
               ],
             ),
             width: MediaQuery.of(context).size.width,
@@ -208,10 +245,13 @@ class _CustomSchedulingState extends State<CustomScheduling> {
           SizedBox(
             height: 5.0,
           ),
-          StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection('scheduling').snapshots(),
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          StreamBuilder<DocumentSnapshot>(
+            stream: Firestore.instance
+                .collection('scheduling')
+                .document(_id)
+                .snapshots(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
                 return scheduleWidget(context, snapshot);
               } else {
@@ -227,11 +267,15 @@ class _CustomSchedulingState extends State<CustomScheduling> {
   }
 
   Widget scheduleWidget(
-      BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+    if (snapshot.data.data == null) {
+      return Container();
+    }
+
     return Container(
       margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
       padding: EdgeInsets.all(10),
-      height: 90,
+      height: MediaQuery.of(context).size.height * 0.13,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: Color(0xff905c96).withOpacity(0.5),
@@ -245,10 +289,10 @@ class _CustomSchedulingState extends State<CustomScheduling> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(
-                "Time: ${snapshot.data.documents.first["time"]}",
+                "Time: ${snapshot.data.data["time"]}",
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
-              Text("Date: ${snapshot.data.documents.first["Date"]}",
+              Text("Date: ${snapshot.data.data["Date"]}",
                   style: TextStyle(fontSize: 20, color: Colors.white)),
             ],
           ),
@@ -260,11 +304,9 @@ class _CustomSchedulingState extends State<CustomScheduling> {
                 "Friends: ",
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
-              for (int i = 0;
-                  i < snapshot.data.documents.first["Friends"].length;
-                  i++)
+              for (int i = 0; i < snapshot.data.data["Friends"].length; i++)
                 Text(
-                  snapshot.data.documents.first["Friends"][i],
+                  snapshot.data.data["Friends"][i],
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 )
             ],
@@ -283,6 +325,8 @@ class SelectBuddy extends StatefulWidget {
 class _SelectBuddyState extends State<SelectBuddy> {
   SharedPreferences prefs;
   bool isSelected = false;
+  double height = 0;
+  double width = 0;
   List<String> friendsName = List();
   @override
   void initState() {
@@ -294,13 +338,15 @@ class _SelectBuddyState extends State<SelectBuddy> {
 
   @override
   Widget build(BuildContext context) {
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       elevation: 0.0,
       backgroundColor: Color(0xffaf5dcc).withOpacity(0.8),
       child: Container(
-        height: 500,
-        width: 200,
+        height: height*0.7,
+        width: width*0.6,
         child: Stack(
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
@@ -341,8 +387,10 @@ class _SelectBuddyState extends State<SelectBuddy> {
       'time': time,
       'Date': date,
       'Friends': friendsName,
+    }).then((value) {
+      Navigator.pop(context);
     });
-    Navigator.pop(context);
+    //Navigator.pop(context);
   }
 
   Widget buildWidget(
@@ -356,7 +404,7 @@ class _SelectBuddyState extends State<SelectBuddy> {
           child: Padding(
             padding: EdgeInsets.only(bottom: 2.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            
               children: <Widget>[
                 Material(
                   child: snapshot.data.documents[count]['photoUrl'] != null
@@ -380,36 +428,41 @@ class _SelectBuddyState extends State<SelectBuddy> {
                   clipBehavior: Clip.hardEdge,
                 ),
                 SizedBox(
-                  width: 5.0,
+                  width: width*0.06,
                 ),
-                Text(
-                  snapshot.data.documents[count]["name"],
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                Container(
+                  width:width*0.3,
+                  child: Text(
+                    snapshot.data.documents[count]["name"],
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
                 SizedBox(
                   width: 5.0,
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                                  child: InkWell(
-                    onTap: () {
-                      friendsName.add(snapshot.data.documents[count]['name']);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(2.0),
-                      child: Center(
-                        child: Text(
-                          "Add",
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
+                Expanded(
+                                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      onTap: () {
+                        friendsName.add(snapshot.data.documents[count]['name']);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(5.0),
+                        child: Center(
+                          child: Text(
+                            "Add",
+                            style: TextStyle(
+                                color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                      width: 70.0,
-                      decoration: BoxDecoration(
-                        color: Color(0xffaf5dcc),
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(20),
+                        width: 70.0,
+                        decoration: BoxDecoration(
+                          color: Color(0xffaf5dcc),
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20),
+                          ),
                         ),
                       ),
                     ),
