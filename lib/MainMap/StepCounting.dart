@@ -8,14 +8,14 @@ import 'dart:async';
 import 'package:pedometer/pedometer.dart';
 //import 'package:toast/toast.dart';
 import './map_request.dart';
-import 'package:fluttertoast/fluttertoast.dart' ;
-
+import 'package:fluttertoast/fluttertoast.dart';
 
 class StepCounting extends StatefulWidget {
   final double lattitude;
   final double longitude;
   final String userName;
-  StepCounting({@required this.lattitude, @required this.longitude,this.userName});
+  StepCounting(
+      {@required this.lattitude, @required this.longitude, this.userName});
   @override
   _StepCountingState createState() => _StepCountingState(
       destinationlattitude: lattitude, destinationlongitude: longitude);
@@ -46,9 +46,11 @@ class _StepCountingState extends State<StepCounting> {
     // TODO: implement initState
     super.initState();
     getUserLocation();
-   // startMain();
+    // startMain();
     initPlatformState();
-    Fluttertoast.showToast(msg: "Request have been sent to ${widget.userName}",toastLength:Toast.LENGTH_LONG);
+    Fluttertoast.showToast(
+        msg: "Request have been sent to ${widget.userName}",
+        toastLength: Toast.LENGTH_LONG);
   }
 
   startMain() async {
@@ -89,6 +91,9 @@ class _StepCountingState extends State<StepCounting> {
   }
 
   Future<void> initPlatformState() async {
+    setState(() {
+      this._stepCountValue = "0";
+    });
     startListening();
   }
 

@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen>
   String assetPDFPath = "";
   bool isLoading = false;
   bool isCheck = false;
+  String Url = "";
   String name, email, password, confirmpassword, dogname, about, photourl;
   int Zip;
 
@@ -130,15 +131,20 @@ class _HomeScreenState extends State<HomeScreen>
     });
     if (_key.currentState.validate()) {
       _key.currentState.save();
+      String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final FirebaseAuth _auth = FirebaseAuth.instance;
       final Firestore _firestore = Firestore.instance;
       String fcmToken = await _fcm.getToken();
       StorageReference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child("UserPhoto");
+          FirebaseStorage.instance.ref().child(currentTime);
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
-      String Url = await taskSnapshot.ref.getDownloadURL();
+      taskSnapshot.ref.getDownloadURL().then((value) {
+        setState(() {
+          this.Url = value;
+        });
+      });
 
       QuerySnapshot querySnapshot = await Firestore.instance
           .collection("users")
@@ -168,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen>
         "DogName": dogname,
         "lattitude": lattitude.toString(),
         "longitude": langitude.toString(),
-        "photoUrl": Url+name,
+        "photoUrl": Url,
         'chattingWith': null,
         'id': null,
         'isActive': false,

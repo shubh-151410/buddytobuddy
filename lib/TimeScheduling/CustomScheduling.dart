@@ -158,7 +158,8 @@ class _CustomSchedulingState extends State<CustomScheduling> {
       body: Column(
         children: <Widget>[
           Container(
-            margin: EdgeInsets.fromLTRB(10, 20, 10, 0),
+            padding: EdgeInsets.only(left: 5.0),
+            margin: EdgeInsets.fromLTRB(5, 20, 5, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -166,55 +167,66 @@ class _CustomSchedulingState extends State<CustomScheduling> {
                   "Create a new schedule",
                   style: TextStyle(color: Colors.white, fontSize: 20.0),
                 ),
-                SizedBox(
-                  width: 50.0,
-                ),
-                Theme(
-                  data: Theme.of(context).copyWith(
-                    primaryColor: Color(0xff905c96),
-                  ),
-                  child: Builder(
-                    builder: (context) {
-                      return FloatingActionButton(
-                        mini: true,
-                        backgroundColor: Color(0xff905c96).withOpacity(0.6),
-                        onPressed: () => selectTime(context),
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                          size: 30.0,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Theme(
-                  data: Theme.of(context).copyWith(
-                    primaryColor: Color(0xff905c96),
-                  ),
-                  child: Builder(
-                    builder: (context) {
-                      return FloatingActionButton(
-                        mini: true,
-                        backgroundColor: Color(0xff905c96).withOpacity(0.6),
-                        onPressed: () async {
-                          var prefs = await SharedPreferences.getInstance();
-                          String id = prefs.getString('id');
-                          print(id);
-                          Firestore.instance
-                              .collection("scheduling")
-                              .document(id)
-                              .delete();
-
-                          //  print(a.snapshots().first);
+                Expanded(
+                  flex: 1,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        primaryColor: Color(0xff905c96),
+                      ),
+                      child: Builder(
+                        builder: (context) {
+                          return FloatingActionButton(
+                            mini: true,
+                            backgroundColor: Color(0xff905c96).withOpacity(0.6),
+                            onPressed: () => selectTime(context),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 30.0,
+                            ),
+                          );
                         },
-                        child: Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                          size: 25.0,
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding:  EdgeInsets.only(right:10.0),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          primaryColor: Color(0xff905c96),
                         ),
-                      );
-                    },
+                        child: Builder(
+                          builder: (context) {
+                            return FloatingActionButton(
+                              mini: true,
+                              backgroundColor: Color(0xff905c96).withOpacity(0.6),
+                              onPressed: () async {
+                                var prefs = await SharedPreferences.getInstance();
+                                String id = prefs.getString('id');
+                                print(id);
+                                Firestore.instance
+                                    .collection("scheduling")
+                                    .document(id)
+                                    .delete();
+
+                                //  print(a.snapshots().first);
+                              },
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                                size: 25.0,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                   ),
                 )
               ],
@@ -345,8 +357,8 @@ class _SelectBuddyState extends State<SelectBuddy> {
       elevation: 0.0,
       backgroundColor: Color(0xffaf5dcc).withOpacity(0.8),
       child: Container(
-        height: height*0.7,
-        width: width*0.6,
+        height: height * 0.7,
+        width: width * 0.6,
         child: Stack(
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
@@ -404,7 +416,6 @@ class _SelectBuddyState extends State<SelectBuddy> {
           child: Padding(
             padding: EdgeInsets.only(bottom: 2.0),
             child: Row(
-            
               children: <Widget>[
                 Material(
                   child: snapshot.data.documents[count]['photoUrl'] != null
@@ -428,10 +439,10 @@ class _SelectBuddyState extends State<SelectBuddy> {
                   clipBehavior: Clip.hardEdge,
                 ),
                 SizedBox(
-                  width: width*0.06,
+                  width: width * 0.06,
                 ),
                 Container(
-                  width:width*0.3,
+                  width: width * 0.3,
                   child: Text(
                     snapshot.data.documents[count]["name"],
                     style: TextStyle(color: Colors.white, fontSize: 16),
@@ -441,7 +452,7 @@ class _SelectBuddyState extends State<SelectBuddy> {
                   width: 5.0,
                 ),
                 Expanded(
-                                  child: Align(
+                  child: Align(
                     alignment: Alignment.centerRight,
                     child: InkWell(
                       onTap: () {
@@ -453,7 +464,8 @@ class _SelectBuddyState extends State<SelectBuddy> {
                           child: Text(
                             "Add",
                             style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                         width: 70.0,

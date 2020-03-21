@@ -25,7 +25,6 @@ void main() {
 }
 
 void backgroundFetchHeadlessTask(String taskId) async {
-  print('[BackgroundFetch] Headless event received.');
   BackgroundFetch.finish(taskId);
 }
 
@@ -34,7 +33,10 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => new _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  Animation animation;
+  AnimationController animationController;
   startTime() async {
     var _duration = new Duration(seconds: 5);
     return new Timer(_duration, navigationPage);
@@ -47,6 +49,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 100));
+    animation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(animationController);
     startTime();
   }
 
