@@ -161,42 +161,16 @@ class _CustomSchedulingState extends State<CustomScheduling> {
             padding: EdgeInsets.only(left: 5.0),
             margin: EdgeInsets.fromLTRB(5, 20, 5, 0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
                   "Create a new schedule",
                   style: TextStyle(color: Colors.white, fontSize: 20.0),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Theme(
-                      data: Theme.of(context).copyWith(
-                        primaryColor: Color(0xff905c96),
-                      ),
-                      child: Builder(
-                        builder: (context) {
-                          return FloatingActionButton(
-                            mini: true,
-                            backgroundColor: Color(0xff905c96).withOpacity(0.6),
-                            onPressed: () => selectTime(context),
-                            child: Icon(
-                              Icons.add,
-                              color: Colors.white,
-                              size: 30.0,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding:  EdgeInsets.only(right:10.0),
+                Row(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerRight,
                       child: Theme(
                         data: Theme.of(context).copyWith(
                           primaryColor: Color(0xff905c96),
@@ -205,30 +179,58 @@ class _CustomSchedulingState extends State<CustomScheduling> {
                           builder: (context) {
                             return FloatingActionButton(
                               mini: true,
-                              backgroundColor: Color(0xff905c96).withOpacity(0.6),
-                              onPressed: () async {
-                                var prefs = await SharedPreferences.getInstance();
-                                String id = prefs.getString('id');
-                                print(id);
-                                Firestore.instance
-                                    .collection("scheduling")
-                                    .document(id)
-                                    .delete();
-
-                                //  print(a.snapshots().first);
-                              },
+                              backgroundColor:
+                                  Color(0xff905c96).withOpacity(0.6),
+                              onPressed: () => selectTime(context),
                               child: Icon(
-                                Icons.delete,
+                                Icons.add,
                                 color: Colors.white,
-                                size: 25.0,
+                                size: 30.0,
                               ),
                             );
                           },
                         ),
                       ),
                     ),
-                  ),
-                )
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 10.0),
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            primaryColor: Color(0xff905c96),
+                          ),
+                          child: Builder(
+                            builder: (context) {
+                              return FloatingActionButton(
+                                mini: true,
+                                backgroundColor:
+                                    Color(0xff905c96).withOpacity(0.6),
+                                onPressed: () async {
+                                  var prefs =
+                                      await SharedPreferences.getInstance();
+                                  String id = prefs.getString('id');
+                                  print(id);
+                                  Firestore.instance
+                                      .collection("scheduling")
+                                      .document(id)
+                                      .delete();
+
+                                  //  print(a.snapshots().first);
+                                },
+                                child: Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                  size: 25.0,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ],
             ),
             width: MediaQuery.of(context).size.width,
@@ -357,16 +359,20 @@ class _SelectBuddyState extends State<SelectBuddy> {
       elevation: 0.0,
       backgroundColor: Color(0xffaf5dcc).withOpacity(0.8),
       child: Container(
-        height: height * 0.7,
+        height: height * 0.8,
         width: width * 0.6,
-        child: Stack(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
               stream: Firestore.instance.collection('users').snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasData) {
-                  return buildWidget(context, snapshot);
+                  return Container(
+                      height: height * 0.7,
+                      child: buildWidget(context, snapshot));
                 } else {
                   return Container(
                     child: CircularProgressIndicator(),
@@ -374,9 +380,8 @@ class _SelectBuddyState extends State<SelectBuddy> {
                 }
               },
             ),
-            Positioned(
-              left: 10.0,
-              bottom: 10.0,
+            Container(
+              margin: EdgeInsets.only(left: width * 0.02),
               child: FloatingActionButton(
                 backgroundColor: Color(0xffaf5dcc),
                 onPressed: () {
@@ -384,7 +389,7 @@ class _SelectBuddyState extends State<SelectBuddy> {
                 },
                 child: Text("OK"),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -408,6 +413,8 @@ class _SelectBuddyState extends State<SelectBuddy> {
   Widget buildWidget(
       BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     return ListView.builder(
+      shrinkWrap: true,
+      scrollDirection: Axis.vertical,
       itemCount: snapshot.data.documents.length,
       itemBuilder: (context, count) {
         return Container(

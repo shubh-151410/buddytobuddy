@@ -57,6 +57,8 @@ class _NewLogInState extends State<NewLogIn> {
   LatLng _center;
   bool isPasswordRight = false;
   bool gpsEnabled;
+  double height = 0;
+  double width = 0;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final FirebaseMessaging _fcm = FirebaseMessaging();
 
@@ -205,45 +207,45 @@ class _NewLogInState extends State<NewLogIn> {
             .where('id', isEqualTo: users.uid)
             .getDocuments();
         final List<DocumentSnapshot> documents = result.documents;
-       
+
         {
-        Firestore.instance.collection('users').document(users.uid).setData({
-          'name': users.displayName,
-          'email': users.email,
-          'id': users.uid,
-          'photoUrl': users.photoUrl,
-          'createdAt': DateTime.now().microsecondsSinceEpoch.toString(),
-          "lattitude": lattitude.toString(),
-          "longitude": langitude.toString(),
-          'chattingWith': null,
-          'About': null,
-          'DogName': null,
-          'Zip': null,
-          'isActive': false,
-          'pushToken':fcmToken,
-        });
-
-        if (fcmToken != null) {
-          var tokens = Firestore.instance
-              .collection('users')
-              .document(users.uid)
-              .collection('tokens')
-              .document(fcmToken);
-
-          await tokens.setData({
-            'token': fcmToken,
-            'createdAt': FieldValue.serverTimestamp(), // optional
-            // optional
+          Firestore.instance.collection('users').document(users.uid).setData({
+            'name': users.displayName,
+            'email': users.email,
+            'id': users.uid,
+            'photoUrl': users.photoUrl,
+            'createdAt': DateTime.now().microsecondsSinceEpoch.toString(),
+            "lattitude": lattitude.toString(),
+            "longitude": langitude.toString(),
+            'chattingWith': null,
+            'About': null,
+            'DogName': null,
+            'Zip': null,
+            'isActive': false,
+            'pushToken': fcmToken,
           });
-        }
 
-        currentUser = users;
-        await prefs.setString('id', currentUser.uid);
-        await prefs.setString('name', currentUser.displayName);
-        await prefs.setString('photoUrl', currentUser.photoUrl);
+          if (fcmToken != null) {
+            var tokens = Firestore.instance
+                .collection('users')
+                .document(users.uid)
+                .collection('tokens')
+                .document(fcmToken);
 
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            await tokens.setData({
+              'token': fcmToken,
+              'createdAt': FieldValue.serverTimestamp(), // optional
+              // optional
+            });
+          }
+
+          currentUser = users;
+          await prefs.setString('id', currentUser.uid);
+          await prefs.setString('name', currentUser.displayName);
+          await prefs.setString('photoUrl', currentUser.photoUrl);
+
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomeScreen()));
         }
       } else {
         Fluttertoast.showToast(msg: "Sign in fail");
@@ -289,7 +291,7 @@ class _NewLogInState extends State<NewLogIn> {
         if (email == list[i]["email"] && password == list[i]["password"]) {
           await prefs.setString(
               "loginId", querySnapshot.documents[i].documentID);
-          print("!!!!!!!!!!!!!!");
+
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Information()),
@@ -312,6 +314,8 @@ class _NewLogInState extends State<NewLogIn> {
   @override
   Widget build(BuildContext context) {
     //Edit Text For Email Id
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
     final username_email = TextFormField(
       controller: useremailcontroller,
       keyboardType: TextInputType.emailAddress,
@@ -367,7 +371,7 @@ class _NewLogInState extends State<NewLogIn> {
         password = value;
       },
     );
-   
+
     final signin_button = Material(
         elevation: 5.0,
         borderRadius: BorderRadius.circular(30.0),
@@ -402,10 +406,16 @@ class _NewLogInState extends State<NewLogIn> {
                             children: <Widget>[
                               Padding(
                                 padding: EdgeInsets.only(top: 0.0, bottom: 0.0),
-                                child: Image.asset(
-                                  "assets/images/ColorLogoMedium.png",
-                                  height: 250,
-                                  width: 300,
+                                child: Container(
+                                  height: height * 0.4,
+                                  width: width * 0.4,
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            "assets/images/final_buddytobody.png"),
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.circular(40.0)),
                                 ),
                               ),
                               SizedBox(

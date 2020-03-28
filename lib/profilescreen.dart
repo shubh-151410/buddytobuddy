@@ -33,8 +33,6 @@ class _ProfileState extends State<Profile> {
 
   bool isLoading = false;
   File avatarImageFile;
-  final FocusNode focusNodeNickname = new FocusNode();
-  final FocusNode focusNodeAboutMe = new FocusNode();
 
   @override
   void initState() {
@@ -46,10 +44,19 @@ class _ProfileState extends State<Profile> {
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
     id = prefs.getString('id') ?? '';
-    nickname = prefs.getString('name') ?? '';
+    print(id);
+    DocumentSnapshot result =
+        await Firestore.instance.collection('users').document(id).get();
+    print(result.data["name"]);
+    nickname = result.data["name"];
+    photoUrl = result.data["photoUrl"];
+    aboutMe = result.data["About"];
+    DogName = result.data["DogName"];
+    Zip = result.data["Zip"];
+    // nickname = prefs.getString('name') ?? '';
 
-    aboutMe = prefs.getString('aboutMe') ?? '';
-    photoUrl = prefs.getString('photoUrl') ?? '';
+    // aboutMe = prefs.getString('aboutMe') ?? '';
+    // photoUrl = prefs.getString('photoUrl') ?? '';
 
     setState(() {
       controllerNickname = new TextEditingController(text: nickname);
@@ -114,8 +121,8 @@ class _ProfileState extends State<Profile> {
   }
 
   void handleUpdateData() {
-    focusNodeNickname.unfocus();
-    focusNodeAboutMe.unfocus();
+    // focusNodeNickname.unfocus();
+    // focusNodeAboutMe.unfocus();
 
     setState(() {
       isLoading = true;
@@ -137,6 +144,7 @@ class _ProfileState extends State<Profile> {
       });
 
       Fluttertoast.showToast(msg: "Update success");
+      Navigator.pop(context);
     }).catchError((err) {
       setState(() {
         isLoading = false;
@@ -151,175 +159,98 @@ class _ProfileState extends State<Profile> {
     var divheight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Profile",
-          style: TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        centerTitle: true,
-        backgroundColor: Color(0xff905c96),
-        elevation: 0.0,
-        actions: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.fromLTRB(5.0, 0, 5.0, 0),
-                child: Icon(
-                  Icons.notifications_active,
-                ),
-              )
-            ],
-          )
-        ],
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back_ios),
-        )
-      ),
-      bottomNavigationBar: Container(
-          child: Container(
-        height: 63.0,
-        decoration: new BoxDecoration(
-            borderRadius: new BorderRadius.only(
-                topLeft: const Radius.circular(0.0),
-                topRight: const Radius.circular(0.0))),
-        child: Container(
-          decoration: new BoxDecoration(
-              color: Color(0xff905c96),
-              borderRadius: new BorderRadius.only(
-                  topLeft: const Radius.circular(0.0),
-                  topRight: const Radius.circular(0.0))),
-          child: new Center(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              // SizedBox(width: 22.0),
-              Container(
-                height: 35,
-                width: 35,
-                child: Image.asset(
-                  "assets/images/Home.png",
-                  color: Colors.white,
-                ),
-              ),
-              // SizedBox(width: 40.0),
-              Container(
-                height: 35,
-                width: 35,
-                child: Image.asset(
-                  "assets/images/shopping-cart.png",
-                  color: Colors.white,
-                ),
-              ),
-              //SizedBox(width: 40.0),
-              Container(
-                height: 35,
-                width: 35,
-                child: Image.asset(
-                  "assets/images/Chat.png",
-                  color: Colors.white.withOpacity(1.0),
-                ),
-              ),
-              // SizedBox(
-              //   width: 40,
-              // ),
-              Container(
-                height: 35,
-                width: 35,
-                child: Image.asset(
-                  "assets/images/Schedule.png",
-                  color: Colors.white,
-                ),
-              ),
-              //SizedBox(width: 50),
-              Container(
-                  height: 35,
-                  width: 35,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SettingScreen()),
-                      );
-                    },
-                    child: Icon(
-                      Icons.settings,
-                      color: Colors.white,
-                      size: 40.0,
-                    ),
-                  ))
-            ],
+          title: Text(
+            "Profile",
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+          centerTitle: true,
+          backgroundColor: Color(0xff905c96),
+          elevation: 0.0,
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.fromLTRB(5.0, 0, 5.0, 0),
+                  child: Icon(
+                    Icons.notifications_active,
+                  ),
+                )
+              ],
+            )
+          ],
+          leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back_ios),
           )),
-        ),
-      )),
       body: Stack(
-
         children: <Widget>[
           SingleChildScrollView(
             child: Container(
               color: Color(0xff905c96),
               height: MediaQuery.of(context).size.height,
               child: Column(
-               
                 children: <Widget>[
                   Container(
                     color: Color(0xff905c96),
                     child: Center(
                       child: Stack(
                         children: <Widget>[
-                          (avatarImageFile == null)
-                              ? (photoUrl != ''
-                                  ? Material(
-                                      child: CachedNetworkImage(
-                                        placeholder: (context, url) =>
-                                            Container(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    themeColor),
+                          GestureDetector(
+                            onTap: getImage,
+                            child: (avatarImageFile == null)
+                                ? (photoUrl != ''
+                                    ? Material(
+                                        child: CachedNetworkImage(
+                                          placeholder: (context, photoUrl) =>
+                                              Container(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      themeColor),
+                                            ),
+                                            width: 90.0,
+                                            height: 90.0,
+                                            padding: EdgeInsets.all(10.0),
                                           ),
+                                          imageUrl: photoUrl,
                                           width: 90.0,
                                           height: 90.0,
-                                          padding: EdgeInsets.all(10.0),
+                                          fit: BoxFit.cover,
                                         ),
-                                        imageUrl: photoUrl,
-                                        width: 90.0,
-                                        height: 90.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(45.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                    )
-                                  : Icon(
-                                      Icons.account_circle,
-                                      size: 90.0,
-                                      color: greyColor,
-                                    ))
-                              : Material(
-                                  child: Image.file(
-                                    avatarImageFile,
-                                    width: 90.0,
-                                    height: 90.0,
-                                    fit: BoxFit.cover,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(45.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                      )
+                                    : Icon(
+                                        Icons.account_circle,
+                                        size: 90.0,
+                                        color: greyColor,
+                                      ))
+                                : Material(
+                                    child: Image.file(
+                                      avatarImageFile,
+                                      width: 90.0,
+                                      height: 90.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(45.0)),
+                                    clipBehavior: Clip.hardEdge,
                                   ),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(45.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.camera_alt,
-                              color: primaryColor.withOpacity(0.5),
-                            ),
-                            onPressed: getImage,
-                            padding: EdgeInsets.all(30.0),
-                            splashColor: Colors.transparent,
-                            highlightColor: greyColor,
-                            iconSize: 30.0,
-                          ),
+                          )
+                          // IconButton(
+                          //   icon: Icon(
+                          //     Icons.camera_alt,
+                          //     color: primaryColor.withOpacity(0.5),
+                          //   ),
+                          //   onPressed: getImage,
+                          //   padding: EdgeInsets.all(30.0),
+                          //   splashColor: Colors.transparent,
+                          //   highlightColor: greyColor,
+                          //   iconSize: 30.0,
+                          // ),
                         ],
                       ),
                     ),
@@ -340,26 +271,21 @@ class _ProfileState extends State<Profile> {
                         width: 6.0,
                       ),
                       Text(
-                        "Shubhanshu",
+                        nickname.toUpperCase(),
                         style: TextStyle(color: Colors.white, fontSize: 20.0),
                       ),
                       SizedBox(
                         width: 6.0,
                       ),
-                      Text(
-                        "23",
-                        style: TextStyle(color: Colors.white, fontSize: 20.0),
-                      )
                     ],
                   )),
                   Column(
-                  
                     children: <Widget>[
-                    
                       Container(
                           child: TextFormField(
                             minLines: 1,
                             maxLines: 1,
+                            style: TextStyle(color: Colors.white),
                             textAlign: TextAlign.center,
                             decoration: InputDecoration(
                               fillColor: Color(0xffaf5dcc),
@@ -369,15 +295,15 @@ class _ProfileState extends State<Profile> {
                                 color: Colors.white,
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+                                borderSide: BorderSide(
+                                    color: Color(0xffaf5dcc), width: 1.5),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(30.0),
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+                                borderSide: BorderSide(
+                                    color: Color(0xffaf5dcc), width: 1.5),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(30.0),
                                 ),
@@ -392,12 +318,13 @@ class _ProfileState extends State<Profile> {
                             onChanged: (value) {
                               nickname = value;
                             },
-                            focusNode: focusNodeNickname,
+                            //focusNode: focusNodeNickname,
                           ),
                           margin: EdgeInsets.only(
                               left: 10.0, right: 10.0, top: 10.0)),
                       Container(
                           child: TextFormField(
+                            style: TextStyle(color: Colors.white),
                             textAlign: TextAlign.center,
                             decoration: InputDecoration(
                               suffixIcon: Icon(
@@ -409,15 +336,15 @@ class _ProfileState extends State<Profile> {
                               hintText: 'About',
                               contentPadding: new EdgeInsets.all(5.0),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+                                borderSide: BorderSide(
+                                    color: Color(0xffaf5dcc), width: 1.5),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(30.0),
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                    color:Color(0xffaf5dcc),
+                                    color: Color(0xffaf5dcc),
                                     width: 1.5,
                                   ),
                                   borderRadius: BorderRadius.circular(30.0)),
@@ -427,13 +354,13 @@ class _ProfileState extends State<Profile> {
                             onChanged: (value) {
                               aboutMe = value;
                             },
-                            focusNode: focusNodeAboutMe,
+                            //focusNode: focusNodeAboutMe,
                           ),
                           margin: EdgeInsets.only(
                               left: 10.0, right: 10.0, top: 10.0)),
-
                       Container(
                         child: TextFormField(
+                          style: TextStyle(color: Colors.white),
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
                               filled: true,
@@ -443,8 +370,8 @@ class _ProfileState extends State<Profile> {
                               contentPadding: EdgeInsets.all(5.0),
                               hintStyle: TextStyle(color: Colors.white),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color:Color(0xffaf5dcc), width: 1.5),
+                                borderSide: BorderSide(
+                                    color: Color(0xffaf5dcc), width: 1.5),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(30.0),
                                 ),
@@ -457,25 +384,25 @@ class _ProfileState extends State<Profile> {
                           onChanged: (value) {
                             aboutMe = value;
                           },
-                          focusNode: focusNodeAboutMe,
+                          // focusNode: focusNodeAboutMe,
                         ),
                         margin:
                             EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
                       ),
-
                       Container(
                         child: TextFormField(
+                          style: TextStyle(color: Colors.white),
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
-                            suffixIcon: Icon(Icons.edit, color: Colors.white),
+                              suffixIcon: Icon(Icons.edit, color: Colors.white),
                               filled: true,
                               fillColor: Color(0xffaf5dcc),
                               hintText: 'Zip',
                               contentPadding: EdgeInsets.all(5.0),
                               hintStyle: TextStyle(color: Colors.white),
                               focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xffaf5dcc), width: 1.5),
+                                borderSide: BorderSide(
+                                    color: Color(0xffaf5dcc), width: 1.5),
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(30.0),
                                 ),
@@ -486,9 +413,9 @@ class _ProfileState extends State<Profile> {
                                       color: Color(0xffaf5dcc), width: 1.5))),
                           controller: controllerZip,
                           onChanged: (value) {
-                            aboutMe = value;
+                            Zip = value;
                           },
-                          focusNode: focusNodeAboutMe,
+                          //focusNode: focusNodeAboutMe,
                         ),
                         margin:
                             EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
@@ -502,13 +429,14 @@ class _ProfileState extends State<Profile> {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Material(
-                      elevation: 5.0,
+                      elevation: 10.0,
                       borderRadius: BorderRadius.circular(30.0),
                       color: Color(0xffaf5dcc),
                       child: Container(
                         width: 120.0,
                         height: 50.0,
                         child: MaterialButton(
+                          // elevation: 5.0,
                           padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                           onPressed: handleUpdateData,
                           child: Text("SAVE",

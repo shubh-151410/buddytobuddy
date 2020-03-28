@@ -35,10 +35,13 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  Animation animation;
   AnimationController animationController;
+  Animation<double> animation;
+  double height = 0;
+  double width = 0;
+
   startTime() async {
-    var _duration = new Duration(seconds: 5);
+    var _duration = new Duration(seconds: 1);
     return new Timer(_duration, navigationPage);
   }
 
@@ -49,23 +52,33 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 100));
+    animationController = new AnimationController(
+      vsync: this,
+      duration: new Duration(seconds: 2),
+    );
     animation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(animationController);
-    startTime();
+        new CurvedAnimation(parent: animationController, curve: Curves.easeIn);
+
+    animation.addListener(() => this.setState(() {}));
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        startTime();
+      }
+    });
+    animationController.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage(
-              "assets/images/logo.png",
-            ),
-            fit: BoxFit.fill),
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
+    return Scaffold(
+      body: Center(
+        child: Image.asset(
+          "assets/images/newbubbylogo.png",
+          width: animation.value * (height * 4),
+          height: animation.value * (height * 4),
+        ),
       ),
     );
   }

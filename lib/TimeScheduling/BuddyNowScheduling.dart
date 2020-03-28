@@ -23,6 +23,8 @@ class _BuddynowState extends State<Buddynow> {
   Geolocator geolocator = Geolocator();
   double lattitude;
   double langitude;
+  double height = 0;
+  double width = 0;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final FirebaseMessaging _fcm = FirebaseMessaging();
   final String serverToken =
@@ -62,6 +64,8 @@ class _BuddynowState extends State<Buddynow> {
 
   @override
   Widget build(BuildContext context) {
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
     return Container(
       margin: EdgeInsets.only(top: 0.0),
       padding: EdgeInsets.only(top: 0.0),
@@ -74,7 +78,7 @@ class _BuddynowState extends State<Buddynow> {
           if (snapshot.hasData) {
             return buildWidget(context, snapshot);
           } else {
-            return CircularProgressIndicator();
+            return Container();
           }
         },
       ),
@@ -130,42 +134,42 @@ class _BuddynowState extends State<Buddynow> {
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                   clipBehavior: Clip.hardEdge,
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        snapshot.data.documents[position]["name"],
-                        style: TextStyle(fontSize: 14, color: Colors.white),
-                      ),
-                      snapshot.data.documents[position]["DogName"] != null
-                          ? Text(
-                              snapshot.data.documents[position]["DogName"],
-                              style:
-                                  TextStyle(fontSize: 14, color: Colors.white),
-                            )
-                          : Text("")
-                    ],
-                  ),
+                SizedBox(width: width * 0.05),
+                Column(
+                  children: <Widget>[
+                    Text(
+                      snapshot.data.documents[position]["name"],
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                    snapshot.data.documents[position]["DogName"] != null
+                        ? Text(
+                            snapshot.data.documents[position]["DogName"],
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                          )
+                        : Text("")
+                  ],
                 ),
                 Expanded(
-                  flex: 3,
-                  child: MaterialButton(
-                    onPressed: () async {
-                      await sendAndRetrieveMessage(
-                          snapshot.data.documents[position]["pushToken"],
-                          double.tryParse(
-                              snapshot.data.documents[position]["lattitude"]),
-                          double.tryParse(
-                              snapshot.data.documents[position]["longitude"]),
-                          snapshot.data.documents[position]["name"]);
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Container(
+                  flex: 2,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: () async {
+                        await sendAndRetrieveMessage(
+                            snapshot.data.documents[position]["pushToken"],
+                            double.tryParse(
+                                snapshot.data.documents[position]["lattitude"]),
+                            double.tryParse(
+                                snapshot.data.documents[position]["longitude"]),
+                            snapshot.data.documents[position]["name"]);
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            width: width * 0.2,
+                            height: height * 0.05,
                             padding: EdgeInsets.all(10),
                             child: Center(
                               child: Text(
@@ -181,30 +185,33 @@ class _BuddynowState extends State<Buddynow> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20))),
                           ),
-                        ),
-                        SizedBox(
-                          height: 5.0,
-                        ),
-                        (langitude != null && lattitude != null)
-                            ? Text(
-                                distance
-                                        .as(
-                                          LengthUnit.Kilometer,
-                                          LatLng(lattitude, langitude),
-                                          LatLng(
+                          SizedBox(
+                            height: 5.0,
+                          ),
+                          (langitude != null && lattitude != null)
+                              ? Text(
+                                  distance
+                                          .as(
+                                            LengthUnit.Kilometer,
+                                            LatLng(lattitude, langitude),
+                                            LatLng(
                                               double.tryParse(snapshot
                                                       .data.documents[position]
                                                   ["lattitude"]),
-                                              double.tryParse(snapshot
-                                                      .data.documents[position]
-                                                  ["longitude"])),
-                                        )
-                                        .toString() +
-                                    " Km Away",
-                                style: TextStyle(color: Colors.white),
-                              )
-                            : Text("Waiting...")
-                      ],
+                                              double.tryParse(
+                                                snapshot.data
+                                                        .documents[position]
+                                                    ["longitude"],
+                                              ),
+                                            ),
+                                          )
+                                          .toString() +
+                                      " Km ",
+                                  style: TextStyle(color: Colors.white),
+                                )
+                              : Text("Waiting...")
+                        ],
+                      ),
                     ),
                   ),
                 )
