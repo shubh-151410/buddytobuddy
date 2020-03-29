@@ -34,7 +34,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin , WidgetsBindingObserver {
   AnimationController animationController;
   Animation<double> animation;
   double height = 0;
@@ -44,6 +44,11 @@ class _SplashScreenState extends State<SplashScreen>
     var _duration = new Duration(seconds: 1);
     return new Timer(_duration, navigationPage);
   }
+  // WidgetsBinding.instance.addObserver(LifecycleEventHandler(
+  //   detachedCallBack: () async => widget.appController.persistState(),
+  //   resumeCallBack: () async {
+  //     _log.finest('resume...');
+  //   }));
 
   void navigationPage() {
     Navigator.of(context).pushReplacementNamed('/HomeScreen');
@@ -52,6 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     animationController = new AnimationController(
       vsync: this,
       duration: new Duration(seconds: 2),
@@ -82,4 +88,19 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.inactive:
+      break;
+      case AppLifecycleState.paused:
+      break;
+      case AppLifecycleState.detached:
+        
+      break;
+      case AppLifecycleState.resumed:
+        
+        break;
+    }
 }
+    }

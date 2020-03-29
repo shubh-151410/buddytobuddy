@@ -4,6 +4,7 @@ import 'package:BuddyToBody/mapScreen.dart';
 import 'package:BuddyToBody/password.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
@@ -224,6 +225,10 @@ class _NewLogInState extends State<NewLogIn> {
             'isActive': false,
             'pushToken': fcmToken,
           });
+
+           final amOnline = FirebaseDatabase.instance.reference().child('users').onValue.listen((Event event) {
+             print(event);
+           });
 
           if (fcmToken != null) {
             var tokens = Firestore.instance
