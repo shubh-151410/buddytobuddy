@@ -1,6 +1,7 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import './login.dart';
+import 'package:video_player/video_player.dart';
 
 import 'package:splashscreen/splashscreen.dart';
 import './mapScreen.dart';
@@ -34,11 +35,12 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin , WidgetsBindingObserver {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   AnimationController animationController;
   Animation<double> animation;
   double height = 0;
   double width = 0;
+  VideoPlayerController _controller;
 
   startTime() async {
     var _duration = new Duration(seconds: 1);
@@ -57,21 +59,18 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    animationController = new AnimationController(
-      vsync: this,
-      duration: new Duration(seconds: 2),
-    );
-    animation =
-        new CurvedAnimation(parent: animationController, curve: Curves.easeIn);
-
-    animation.addListener(() => this.setState(() {}));
-    animation.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        startTime();
+    _controller =
+        VideoPlayerController.asset('assets/video/finallogoanimation.mp4');
+    _controller.setLooping(false);
+    _controller.initialize().then((_) => setState(() {}));
+    _controller.play();
+    _controller.addListener(() {
+      print(_controller.value.position);
+      if (_controller.value.position.inSeconds == 9) {
+        Navigator.of(context).pushReplacementNamed('/HomeScreen');
       }
     });
-    animationController.forward();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -79,28 +78,35 @@ class _SplashScreenState extends State<SplashScreen>
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Color(0xffD88DD4),
       body: Center(
-        child: Image.asset(
-          "assets/images/newbubbylogo.png",
-          width: animation.value * (height * 4),
-          height: animation.value * (height * 4),
+        child: Stack(
+          children: <Widget>[
+            Container(
+              height: height * 0.5,
+              width: width,
+              child: AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.inactive:
-      break;
+        break;
       case AppLifecycleState.paused:
-      break;
+        break;
       case AppLifecycleState.detached:
-        
-      break;
+        break;
       case AppLifecycleState.resumed:
-        
         break;
     }
+  }
 }
-    }

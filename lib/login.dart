@@ -82,7 +82,7 @@ class _NewLogInState extends State<NewLogIn> {
   // ignore: must_call_super
   void dispose() {
     useremailcontroller.clear();
-    passwordcontroller.clear();
+    passwordcontroller.clear(); 
     this.setState(() {
       isLoading = false;
     });
@@ -409,23 +409,23 @@ class _NewLogInState extends State<NewLogIn> {
                           autovalidate: _validate,
                           child: Column(
                             children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(top: 0.0, bottom: 0.0),
-                                child: Container(
-                                  height: height * 0.4,
-                                  width: width * 0.4,
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage(
-                                            "assets/images/final_buddytobody.png"),
-                                      ),
-                                      borderRadius:
-                                          BorderRadius.circular(40.0)),
-                                ),
+                              Container(
+                                margin: EdgeInsets.only(top:height*0.02),
+                                height: height * 0.3,
+                                width: height * 0.3,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/final_buddytobody.png"),
+                                        fit: BoxFit.fill
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.circular(40.0)),
                               ),
                               SizedBox(
-                                height: 20,
+                                height:height*0.03
                               ),
+                             
                               Container(
                                 padding: EdgeInsets.all(0.0),
                                 margin: EdgeInsets.all(0.0),
