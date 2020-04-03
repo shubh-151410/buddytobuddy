@@ -381,13 +381,24 @@ class _SelectBuddyState extends State<SelectBuddy> {
               },
             ),
             Container(
-              margin: EdgeInsets.only(left: width * 0.02),
-              child: FloatingActionButton(
-                backgroundColor: Color(0xffaf5dcc),
-                onPressed: () {
-                  customScheduling();
-                },
-                child: Text("OK"),
+              margin: EdgeInsets.only(left: 10.0, top: height * 0.03),
+              child: GestureDetector(
+                onTap: () => customScheduling(),
+                child: Material(
+                  borderRadius: BorderRadius.circular(20.0),
+                  color: Color(0xffaf5dcc),
+                  elevation: 5.0,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 0.0),
+                    alignment: Alignment.center,
+                    height: height * 0.05,
+                    width: width * 0.15,
+                    child: Text(
+                      "OK",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

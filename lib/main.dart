@@ -66,11 +66,12 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.play();
     _controller.addListener(() {
       print(_controller.value.position);
-      if (_controller.value.position.inSeconds == 9) {
+      print("################");
+      
+      if (_controller.value.position.inSeconds == 6) {
         Navigator.of(context).pushReplacementNamed('/HomeScreen');
       }
     });
-    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -83,13 +84,13 @@ class _SplashScreenState extends State<SplashScreen>
         child: Stack(
           children: <Widget>[
             Container(
-              height: height * 0.5,
-              width: width,
+             
               child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
+                aspectRatio: _controller.value.aspectRatio/1.5,
                 child: VideoPlayer(_controller),
               ),
             ),
+            
           ],
         ),
       ),

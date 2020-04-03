@@ -411,8 +411,8 @@ class _NewLogInState extends State<NewLogIn> {
                             children: <Widget>[
                               Container(
                                 margin: EdgeInsets.only(top:height*0.02),
-                                height: height * 0.3,
-                                width: height * 0.3,
+                                height: height * 0.25,
+                                width: height * 0.25,
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
                                       image: AssetImage(
