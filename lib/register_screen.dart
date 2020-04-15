@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     child: Container(
                                       margin: EdgeInsets.only(top: 30),
                                       child: new Image.asset(
-                                        "assets/images/photo_camera.png",
+                                        "assets/images/photo.png",
                                         height: 60,
                                       ),
                                     ),
@@ -274,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     image: new ExactAssetImage(_image.path),
                                     fit: BoxFit.cover,
                                   ),
-                                  border: Border.all(width: 5.0),
+                                  border: Border.all(width: 0.0),
                                   borderRadius: new BorderRadius.all(
                                       const Radius.circular(100.0)),
                                 ),

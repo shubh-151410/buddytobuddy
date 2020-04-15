@@ -66,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.play();
     _controller.addListener(() {
       print(_controller.value.position);
-      print("################");
+   
       
       if (_controller.value.position.inSeconds == 6) {
         Navigator.of(context).pushReplacementNamed('/HomeScreen');

@@ -1,12 +1,15 @@
 //import 'package:background_fetch/background_fetch.dart';
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_fetch/background_fetch.dart';
+import 'package:http/http.dart' as http;
 
 DateTime selectedDate = DateTime.now();
 String time, date;
@@ -163,9 +166,12 @@ class _CustomSchedulingState extends State<CustomScheduling> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  "Create a new schedule",
-                  style: TextStyle(color: Colors.white, fontSize: 20.0),
+                Container(
+                  padding: EdgeInsets.only(left: 10.0),
+                  child: Text(
+                    "Create a new schedule",
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
+                  ),
                 ),
                 Row(
                   children: <Widget>[
@@ -342,6 +348,12 @@ class _SelectBuddyState extends State<SelectBuddy> {
   double height = 0;
   double width = 0;
   List<String> friendsName = List();
+  List<String> appId = List();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+  final String serverToken =
+      'APA91bHjnkjcufsyW7X1ueiSHY68rBAd7Fg7NvCkgEvfARI0lhw3pGZ0PQZ9g_9LAd5o4yt3zQMlblMzIfdwtk0JSOTQEXUtnscfQ432qhQ_BX9DgNWgllDnsZl0pR7Nn';
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   @override
   void initState() {
     friendsName.clear();
@@ -383,10 +395,13 @@ class _SelectBuddyState extends State<SelectBuddy> {
             Container(
               margin: EdgeInsets.only(left: 10.0, top: height * 0.03),
               child: GestureDetector(
-                onTap: () => customScheduling(),
+                onTap: () async{
+                   customScheduling();
+                  sendAndRetrieveMessage();
+                },
                 child: Material(
                   borderRadius: BorderRadius.circular(20.0),
-                  color: Color(0xffaf5dcc),
+                  color: Colors.white,
                   elevation: 5.0,
                   child: Container(
                     margin: EdgeInsets.only(left: 0.0),
@@ -395,7 +410,7 @@ class _SelectBuddyState extends State<SelectBuddy> {
                     width: width * 0.15,
                     child: Text(
                       "OK",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -475,6 +490,7 @@ class _SelectBuddyState extends State<SelectBuddy> {
                     child: InkWell(
                       onTap: () {
                         friendsName.add(snapshot.data.documents[count]['name']);
+                        appId.add(snapshot.data.documents[count]['pushToken']);
                       },
                       child: Container(
                         padding: EdgeInsets.all(5.0),
@@ -509,5 +525,52 @@ class _SelectBuddyState extends State<SelectBuddy> {
         );
       },
     );
+  }
+
+
+   Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
+    await firebaseMessaging.requestNotificationPermissions(
+      const IosNotificationSettings(
+          sound: true, badge: true, alert: true, provisional: false),
+    );
+
+    var a = await http.post(
+      'https://fcm.googleapis.com/fcm/send',
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization':
+            'key=AAAA7rAJNeA:APA91bE88G3Thx1CsYkIAA04Y6wmfuHoFkjOY2ScigP_sZEPaC6967ppdd2Hh8TsbZVrOlk4dcd8I2lD1-bTtB7yVxoETy_VNbLmtIKIdvkGSbXOa4ObqAFSaOa67BKuTBGaZ6XIehrB',
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'notification': <String, dynamic>{
+            'body': 'Dog walking request',
+            'title': 'BuddyToBuddy'
+          },
+          'priority': 'high',
+          "data": {"title": "new messages", "score": "5x1", "time": "15:10"},
+          "to": jsonEncode(appId).toString()
+        },
+      ),
+    );
+
+     print("!!!!!!!!!!!!!!!!!!!!!!!!!");
+    print(a.body);
+    print(a.statusCode);
+    print(a.headers);
+
+   
+   
+
+    final Completer<Map<String, dynamic>> completer =
+        Completer<Map<String, dynamic>>();
+
+    firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        completer.complete(message);
+      },
+    );
+
+    return completer.future;
   }
 }

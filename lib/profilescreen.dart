@@ -92,7 +92,7 @@ class _ProfileState extends State<Profile> {
           Firestore.instance.collection('users').document(id).updateData({
             'name': nickname,
             'About': aboutMe,
-            'photourl': photoUrl,
+            'photoUrl': photoUrl,
           }).then((data) async {
             await prefs.setString('photoUrl', photoUrl);
             setState(() {
@@ -190,6 +190,7 @@ class _ProfileState extends State<Profile> {
               color: Color(0xff905c96),
               height: MediaQuery.of(context).size.height,
               child: Column(
+               
                 children: <Widget>[
                   Container(
                     color: Color(0xff905c96),
@@ -240,17 +241,6 @@ class _ProfileState extends State<Profile> {
                                     clipBehavior: Clip.hardEdge,
                                   ),
                           )
-                          // IconButton(
-                          //   icon: Icon(
-                          //     Icons.camera_alt,
-                          //     color: primaryColor.withOpacity(0.5),
-                          //   ),
-                          //   onPressed: getImage,
-                          //   padding: EdgeInsets.all(30.0),
-                          //   splashColor: Colors.transparent,
-                          //   highlightColor: greyColor,
-                          //   iconSize: 30.0,
-                          // ),
                         ],
                       ),
                     ),
@@ -280,6 +270,8 @@ class _ProfileState extends State<Profile> {
                     ],
                   )),
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        
                     children: <Widget>[
                       Container(
                           child: TextFormField(
@@ -290,10 +282,6 @@ class _ProfileState extends State<Profile> {
                             decoration: InputDecoration(
                               fillColor: Color(0xffaf5dcc),
                               filled: true,
-                              suffixIcon: Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                              ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                     color: Color(0xffaf5dcc), width: 1.5),
@@ -322,15 +310,12 @@ class _ProfileState extends State<Profile> {
                           ),
                           margin: EdgeInsets.only(
                               left: 10.0, right: 10.0, top: 10.0)),
+                        
                       Container(
                           child: TextFormField(
                             style: TextStyle(color: Colors.white),
                             textAlign: TextAlign.center,
                             decoration: InputDecoration(
-                              suffixIcon: Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                              ),
                               fillColor: Color(0xffaf5dcc),
                               filled: true,
                               hintText: 'About',
@@ -365,7 +350,6 @@ class _ProfileState extends State<Profile> {
                           decoration: InputDecoration(
                               filled: true,
                               fillColor: Color(0xffaf5dcc),
-                              suffixIcon: Icon(Icons.edit, color: Colors.white),
                               hintText: 'Dog Name',
                               contentPadding: EdgeInsets.all(5.0),
                               hintStyle: TextStyle(color: Colors.white),
@@ -389,12 +373,12 @@ class _ProfileState extends State<Profile> {
                         margin:
                             EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
                       ),
+                     
                       Container(
                         child: TextFormField(
                           style: TextStyle(color: Colors.white),
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
-                              suffixIcon: Icon(Icons.edit, color: Colors.white),
                               filled: true,
                               fillColor: Color(0xffaf5dcc),
                               hintText: 'Zip',

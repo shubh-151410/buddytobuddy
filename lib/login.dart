@@ -75,6 +75,7 @@ class _NewLogInState extends State<NewLogIn> {
     super.initState();
     getUserLocation();
     isSignedIn();
+   
     //isFirebaseSignedIn();
   }
 
@@ -82,7 +83,7 @@ class _NewLogInState extends State<NewLogIn> {
   // ignore: must_call_super
   void dispose() {
     useremailcontroller.clear();
-    passwordcontroller.clear(); 
+    passwordcontroller.clear();
     this.setState(() {
       isLoading = false;
     });
@@ -95,17 +96,7 @@ class _NewLogInState extends State<NewLogIn> {
 
   getUserLocation() async {
     try {
-      // gpsEnabled = await geolocator.isLocationServiceEnabled();
-
-      // if (!gpsEnabled) {
-      //   return showDialog<void>(
-      //     context: context,
-      //     barrierDismissible: false, // user must tap button!
-      //     builder: (BuildContext context) {
-      //       return customLocationDialog();
-      //     },
-      //   );
-      // }
+     
 
       currentLocation = await locateUser();
 
@@ -226,9 +217,13 @@ class _NewLogInState extends State<NewLogIn> {
             'pushToken': fcmToken,
           });
 
-           final amOnline = FirebaseDatabase.instance.reference().child('users').onValue.listen((Event event) {
-             print(event);
-           });
+          final amOnline = FirebaseDatabase.instance
+              .reference()
+              .child('users')
+              .onValue
+              .listen((Event event) {
+            print(event);
+          });
 
           if (fcmToken != null) {
             var tokens = Firestore.instance
@@ -294,8 +289,7 @@ class _NewLogInState extends State<NewLogIn> {
       var list = querySnapshot.documents;
       for (int i = 0; i < querySnapshot.documents.length; i++) {
         if (email == list[i]["email"] && password == list[i]["password"]) {
-          await prefs.setString(
-              "loginId", querySnapshot.documents[i].documentID);
+          await prefs.setString("id", querySnapshot.documents[i].documentID);
 
           Navigator.push(
             context,
@@ -410,22 +404,17 @@ class _NewLogInState extends State<NewLogIn> {
                           child: Column(
                             children: <Widget>[
                               Container(
-                                margin: EdgeInsets.only(top:height*0.02),
+                                margin: EdgeInsets.only(top: height * 0.1),
                                 height: height * 0.25,
                                 width: height * 0.25,
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          "assets/images/final_buddytobody.png"),
-                                        fit: BoxFit.fill
-                                    ),
-                                    borderRadius:
-                                        BorderRadius.circular(40.0)),
+                                        image: AssetImage(
+                                            "assets/images/final_logo.jpeg"),
+                                        fit: BoxFit.fill),
+                                    borderRadius: BorderRadius.circular(15.0)),
                               ),
-                              SizedBox(
-                                height:height*0.03
-                              ),
-                             
+                              SizedBox(height: height * 0.03),
                               Container(
                                 padding: EdgeInsets.all(0.0),
                                 margin: EdgeInsets.all(0.0),

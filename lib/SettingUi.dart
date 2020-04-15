@@ -317,17 +317,31 @@ class _SettingScreenState extends State<SettingScreen> {
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 15.0),
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              child: Text(
-                                "Support",
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
-                              ),
-                            )),
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: GestureDetector(
+                                  child: Text(
+                                    "Support",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                )),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, top: 1.0, right: 15.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 0.7, color: Colors.white))),
+                            ),
+                          ),
+                        ],
                       ),
                       Column(
                         children: <Widget>[
