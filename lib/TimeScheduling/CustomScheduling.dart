@@ -397,7 +397,7 @@ class _SelectBuddyState extends State<SelectBuddy> {
               child: GestureDetector(
                 onTap: () async{
                    customScheduling();
-                  sendAndRetrieveMessage();
+                  // sendAndRetrieveMessage();
                 },
                 child: Material(
                   borderRadius: BorderRadius.circular(20.0),
@@ -490,7 +490,8 @@ class _SelectBuddyState extends State<SelectBuddy> {
                     child: InkWell(
                       onTap: () {
                         friendsName.add(snapshot.data.documents[count]['name']);
-                        appId.add(snapshot.data.documents[count]['pushToken']);
+                       // appId.add(snapshot.data.documents[count]['pushToken']);
+                        sendAndRetrieveMessage(snapshot.data.documents[count]['pushToken']);
                       },
                       child: Container(
                         padding: EdgeInsets.all(5.0),
@@ -528,7 +529,7 @@ class _SelectBuddyState extends State<SelectBuddy> {
   }
 
 
-   Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
+  Future<Map<String, dynamic>> sendAndRetrieveMessage(String userpushtoken) async {
     await firebaseMessaging.requestNotificationPermissions(
       const IosNotificationSettings(
           sound: true, badge: true, alert: true, provisional: false),
@@ -549,17 +550,15 @@ class _SelectBuddyState extends State<SelectBuddy> {
           },
           'priority': 'high',
           "data": {"title": "new messages", "score": "5x1", "time": "15:10"},
-          "to": jsonEncode(appId).toString()
+          "to": userpushtoken
         },
       ),
     );
 
-     print("!!!!!!!!!!!!!!!!!!!!!!!!!");
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!");
     print(a.body);
     print(a.statusCode);
     print(a.headers);
-
-   
    
 
     final Completer<Map<String, dynamic>> completer =
