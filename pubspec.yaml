@@ -44,7 +44,7 @@ dependencies:
   flutter_full_pdf_viewer: ^1.0.4
   cached_network_image: ^2.0.0-rc
   flutter_plugin_pdf_viewer: ^1.0.7
-  flutter_pdfview: ^1.0.0+9
+  # flutter_pdfview: ^1.0.0+9
 
   path_provider: ^1.2.0
   flutter_launcher_icons: ^0.7.2+1
@@ -54,9 +54,9 @@ dependencies:
   flutter_polyline_points: ^0.1.0
   firebase_messaging: ^6.0.9
   background_fetch: ^0.5.4
-  pdftron_flutter:
-    git:
-      url: git://github.com/PDFTron/pdftron-flutter.git
+  # pdftron_flutter:
+  #   git:
+  #     url: git://github.com/PDFTron/pdftron-flutter.git
 
   # firebase_analytics: ^1.0.4
   # firebase_auth:

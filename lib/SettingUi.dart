@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
+// import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -432,7 +432,7 @@ class _PdfViewPageState extends State<PdfViewPage> {
   int _totalPages = 0;
   int _currentPage = 0;
   bool pdfReady = false;
-  PDFViewController _pdfViewController;
+  // PDFViewController _pdfViewController;
 
   @override
   Widget build(BuildContext context) {
@@ -441,64 +441,65 @@ class _PdfViewPageState extends State<PdfViewPage> {
         backgroundColor: Color(0xff905c96),
         title: Text("Privacy And Policy"),
       ),
-      body: Stack(
-        children: <Widget>[
-          PDFView(
-            filePath: widget.path,
-            autoSpacing: true,
-            enableSwipe: true,
-            pageSnap: true,
-            swipeHorizontal: true,
-            nightMode: false,
-            onError: (e) {
-              print(e);
-            },
-            onRender: (_pages) {
-              setState(() {
-                _totalPages = _pages;
-                pdfReady = true;
-              });
-            },
-            onViewCreated: (PDFViewController vc) {
-              _pdfViewController = vc;
-            },
-            onPageChanged: (int page, int total) {
-              setState(() {});
-            },
-            onPageError: (page, e) {},
-          ),
-          !pdfReady
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Offstage()
-        ],
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          _currentPage > 0
-              ? FloatingActionButton.extended(
-                  backgroundColor: Colors.red,
-                  label: Text("Go to ${_currentPage - 1}"),
-                  onPressed: () {
-                    _currentPage -= 1;
-                    _pdfViewController.setPage(_currentPage);
-                  },
-                )
-              : Offstage(),
-          _currentPage + 1 < _totalPages
-              ? FloatingActionButton.extended(
-                  backgroundColor: Colors.green,
-                  label: Text("Go to ${_currentPage + 1}"),
-                  onPressed: () {
-                    _currentPage += 1;
-                    _pdfViewController.setPage(_currentPage);
-                  },
-                )
-              : Offstage(),
-        ],
-      ),
+      body: Container(),
+      // body: Stack(
+      //   children: <Widget>[
+      //     PDFView(
+      //       filePath: widget.path,
+      //       autoSpacing: true,
+      //       enableSwipe: true,
+      //       pageSnap: true,
+      //       swipeHorizontal: true,
+      //       nightMode: false,
+      //       onError: (e) {
+      //         print(e);
+      //       },
+      //       onRender: (_pages) {
+      //         setState(() {
+      //           _totalPages = _pages;
+      //           pdfReady = true;
+      //         });
+      //       },
+      //       onViewCreated: (PDFViewController vc) {
+      //         _pdfViewController = vc;
+      //       },
+      //       onPageChanged: (int page, int total) {
+      //         setState(() {});
+      //       },
+      //       onPageError: (page, e) {},
+      //     ),
+      //     !pdfReady
+      //         ? Center(
+      //             child: CircularProgressIndicator(),
+      //           )
+      //         : Offstage()
+      //   ],
+      // ),
+      // floatingActionButton: Row(
+      //   mainAxisAlignment: MainAxisAlignment.end,
+      //   children: <Widget>[
+      //     _currentPage > 0
+      //         ? FloatingActionButton.extended(
+      //             backgroundColor: Colors.red,
+      //             label: Text("Go to ${_currentPage - 1}"),
+      //             onPressed: () {
+      //               _currentPage -= 1;
+      //               _pdfViewController.setPage(_currentPage);
+      //             },
+      //           )
+      //         : Offstage(),
+      //     _currentPage + 1 < _totalPages
+      //         ? FloatingActionButton.extended(
+      //             backgroundColor: Colors.green,
+      //             label: Text("Go to ${_currentPage + 1}"),
+      //             onPressed: () {
+      //               _currentPage += 1;
+      //               _pdfViewController.setPage(_currentPage);
+      //             },
+      //           )
+      //         : Offstage(),
+      //   ],
+      // ),
     );
   }
 }
